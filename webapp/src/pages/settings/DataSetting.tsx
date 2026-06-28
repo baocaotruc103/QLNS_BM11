@@ -72,10 +72,52 @@ export default function DataSetting() {
                      else successCount++;
                   }
                } else {
-                  // Bảng 1-n (như BHYT Thân nhân, Gia đình...) chưa truyền ID thì luôn luôn INSERT
-                  const { error: insErr } = await supabase.from(importTable).insert([record]);
-                  if (insErr) console.error(`Lỗi thêm mới mã ${record.ma_dinh_danh}:`, insErr);
-                  else successCount++;
+                  // Bảng 1-n, xử lý khi không truyền ID (tìm theo trường định danh phụ để tránh trùng lặp)
+                  let lookupColumn = null;
+                  let lookupValue = null;
+
+                  if (['bhyt_than_nhan', 'thong_tin_nhan_than'].includes(importTable) && record.ho_ten) {
+                    lookupColumn = 'ho_ten';
+                    lookupValue = record.ho_ten;
+                  } else if (importTable === 'luong' && record.thang_nam_bat_dau) {
+                    lookupColumn = 'thang_nam_bat_dau';
+                    lookupValue = record.thang_nam_bat_dau;
+                  } else if (importTable === 'suc_khoe' && record.thoi_gian) {
+                    lookupColumn = 'thoi_gian';
+                    lookupValue = record.thoi_gian;
+                  } else if (importTable === 'danh_gia_nhiem_vu' && record.nam) {
+                    lookupColumn = 'nam';
+                    lookupValue = record.nam;
+                  } else if (importTable === 'khen_thuong' && record.nam) {
+                    lookupColumn = 'nam';
+                    lookupValue = record.nam;
+                  } else if (importTable === 'ky_luat' && record.nam) {
+                    lookupColumn = 'nam';
+                    lookupValue = record.nam;
+                  } else if (importTable === 'thong_tin_dao_tao' && record.thang_nam_bat_dau) {
+                    lookupColumn = 'thang_nam_bat_dau';
+                    lookupValue = record.thang_nam_bat_dau;
+                  }
+
+                  if (lookupColumn && lookupValue !== undefined && lookupValue !== null) {
+                    const { data } = await supabase.from(importTable).select('id').eq('ma_dinh_danh', record.ma_dinh_danh).eq(lookupColumn, lookupValue);
+                    if (data && data.length > 0) {
+                      // Tồn tại bản ghi trùng khớp -> Cập nhật
+                      const { error } = await supabase.from(importTable).update(record).eq('id', data[0].id);
+                      if (error) console.error(`Lỗi cập nhật ${importTable}:`, error);
+                      else successCount++;
+                    } else {
+                      // Không tìm thấy -> Thêm mới
+                      const { error: insErr } = await supabase.from(importTable).insert([record]);
+                      if (insErr) console.error(`Lỗi thêm mới ${importTable}:`, insErr);
+                      else successCount++;
+                    }
+                  } else {
+                    // Nếu không có trường định danh phụ hợp lệ, luôn thêm mới
+                    const { error: insErr } = await supabase.from(importTable).insert([record]);
+                    if (insErr) console.error(`Lỗi thêm mới mã ${record.ma_dinh_danh}:`, insErr);
+                    else successCount++;
+                  }
                }
             }
          }
