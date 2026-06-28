@@ -20,6 +20,21 @@ export default function DataTable({ title, columns, data, formatLabel, onAdd, on
   const hasActions = onView || onEdit || onDelete;
   const showInlineAdd = actionState === 'add' && renderInlineAction;
 
+  const isFullDateField = (col: string) => col.includes('ngay_') || col === 'thoi_gian' || col === 'han_dung';
+  const isMonthYearField = (col: string) => col.includes('thang_nam') && !col.includes('ngay_');
+
+  const formatDateVal = (col: string, val: any) => {
+    if (val === null || val === undefined || val === '') return val;
+    if (isFullDateField(col) && /^\d{4}-\d{2}-\d{2}/.test(String(val))) {
+      const match = String(val).match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (match) return `${match[3]}/${match[2]}/${match[1]}`;
+    } else if (isMonthYearField(col) && /^\d{4}-\d{2}-\d{2}/.test(String(val))) {
+      const match = String(val).match(/^(\d{4})-(\d{2})/);
+      if (match) return `${match[2]}/${match[1]}`;
+    }
+    return val;
+  };
+
   return (
     <div className="animate-fade-in" style={{ width: '100%' }}>
       {/* Table Header */}
@@ -67,10 +82,11 @@ export default function DataTable({ title, columns, data, formatLabel, onAdd, on
                   <React.Fragment key={row.id || idx}>
                     <tr className="data-row">
                       {columns.map((col, i) => {
-                        const val = row[col];
+                        const rawVal = row[col];
+                        const val = formatDateVal(col, rawVal);
                         return (
                           <td key={i} data-label={formatLabel(col)} style={{ whiteSpace: 'nowrap' }}>
-                            {val !== null && val !== undefined && val !== '' ? val : <span style={{ color: 'var(--text-muted)' }}>-</span>}
+                            {val !== null && val !== undefined && val !== '' ? String(val) : <span style={{ color: 'var(--text-muted)' }}>-</span>}
                           </td>
                         );
                       })}

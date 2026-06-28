@@ -16,7 +16,7 @@ interface RecordModalProps {
 }
 
 const isMonthYearField = (col: string) => col.includes('thang_nam') && !col.includes('ngay_');
-const isFullDateField = (col: string) => col.includes('ngay_');
+const isFullDateField = (col: string) => col.includes('ngay_') || col === 'thoi_gian' || col === 'han_dung';
 
 const renderLabel = (label: string) => {
   if (!label) return label;

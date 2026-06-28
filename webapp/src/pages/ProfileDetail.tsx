@@ -11,7 +11,7 @@ import { PARENT_TABLE, TABLES, formatFieldLabel, getTableConfig } from '../lib/t
 const SYSTEM_COLUMNS = ['id', 'created_at', 'updated_at', 'stt', 'trang_thai_du_lieu_cap_2'];
 
 const isMonthYearField = (col: string) => col.includes('thang_nam') && !col.includes('ngay_');
-const isFullDateField = (col: string) => col.includes('ngay_');
+const isFullDateField = (col: string) => col.includes('ngay_') || col === 'thoi_gian' || col === 'han_dung';
 
 const getNoiCapCccd = (dateStr: string) => {
   let parsedDate: Date | null = null;
