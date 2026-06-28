@@ -27,7 +27,20 @@ export const exportToExcelTemplate = (dataByTable: Record<string, any[]>, filena
     // Prepare data rows
     const data = dataByTable[tableName] || [];
     const rows = data.map(row => {
-      return headers.map(h => row[h.key] === null || row[h.key] === undefined ? '' : row[h.key]);
+      return headers.map(h => {
+        let val = row[h.key];
+        if (val === null || val === undefined) return '';
+        if (typeof val === 'string') {
+          if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+            const [y, m, d] = val.split('-');
+            return `${d}/${m}/${y}`;
+          } else if (/^\d{4}-\d{2}$/.test(val)) {
+            const [y, m] = val.split('-');
+            return `${m}/${y}`;
+          }
+        }
+        return val;
+      });
     });
 
     const worksheet = XLSX.utils.aoa_to_sheet([headerRow, ...rows]);
@@ -92,6 +105,21 @@ export const parseExcelFile = async (file: File): Promise<Record<string, any[]>>
                     val = new Date(val.getTime() - (val.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
                   } else if (typeof val === 'string') {
                     val = val.trim();
+                    // Convert dd/mm/yyyy to yyyy-mm-dd
+                    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(val)) {
+                      const parts = val.split('/');
+                      const d = parts[0].padStart(2, '0');
+                      const m = parts[1].padStart(2, '0');
+                      const y = parts[2];
+                      val = `${y}-${m}-${d}`;
+                    } 
+                    // Convert mm/yyyy to yyyy-mm-01
+                    else if (/^\d{1,2}\/\d{4}$/.test(val)) {
+                      const parts = val.split('/');
+                      const m = parts[0].padStart(2, '0');
+                      const y = parts[1];
+                      val = `${y}-${m}-01`;
+                    }
                   }
 
                   if (val !== undefined && val !== null && val !== '') {
