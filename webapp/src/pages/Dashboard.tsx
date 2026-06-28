@@ -72,24 +72,23 @@ export default function Dashboard() {
 
     const { data: result, error } = await supabase
       .from(PARENT_TABLE)
-      .select('ma_dinh_danh, ho_va_ten_khai_sinh, don_vi, dien_bo_tri, cap_bac, chuc_vu, thang_nam_vao_quan_doi, thang_nam_ve_khoa_cong_tac, thong_tin_chung(ngay_vao_dang)')
+      .select('ma_dinh_danh, ho_va_ten_khai_sinh, don_vi, dien_bo_tri, cap_bac, chuc_vu, thang_nam_vao_quan_doi, thang_nam_ve_khoa_cong_tac')
       .order('ho_va_ten_khai_sinh', { ascending: true })
       .limit(100);
 
     if (result && !error && result.length > 0) {
-      // Map the joined thong_tin_chung data up to the parent object
+      // Fetch ngay_vao_dang separately to avoid foreign key relationship errors
+      const maDinhDanhs = result.map(r => r.ma_dinh_danh);
+      const { data: ttcData } = await supabase
+        .from('thong_tin_chung')
+        .select('ma_dinh_danh, ngay_vao_dang')
+        .in('ma_dinh_danh', maDinhDanhs);
+
       const mappedResult = result.map((item: any) => {
-        let ngay_vao_dang = null;
-        if (item.thong_tin_chung) {
-          if (Array.isArray(item.thong_tin_chung) && item.thong_tin_chung.length > 0) {
-            ngay_vao_dang = item.thong_tin_chung[0].ngay_vao_dang;
-          } else if (!Array.isArray(item.thong_tin_chung)) {
-            ngay_vao_dang = item.thong_tin_chung.ngay_vao_dang;
-          }
-        }
+        const ttc = ttcData?.find(t => t.ma_dinh_danh === item.ma_dinh_danh);
         return {
           ...item,
-          ngay_vao_dang
+          ngay_vao_dang: ttc?.ngay_vao_dang || null
         };
       });
       setData(mappedResult);
