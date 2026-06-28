@@ -536,24 +536,35 @@ tr:last-child td {
     border: none;
     border-bottom: 1px solid #edf2f7;
     position: relative;
-    padding: 0.65rem 0 0.65rem 42% !important;
-    text-align: right;
+    padding: 0.65rem 0 !important;
+    text-align: left !important;
     white-space: normal !important;
     min-height: 2.75rem;
     word-break: break-word;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 
   .responsive-data-container td:before {
-    content: attr(data-label);
-    position: absolute;
-    left: 0;
-    width: 38%;
-    padding-right: 10px;
-    white-space: nowrap;
+    content: attr(data-label) ":";
+    position: relative;
+    width: auto;
+    min-width: 100px;
+    max-width: 40%;
+    padding-right: 0;
+    white-space: normal;
     text-align: left;
     font-weight: 700;
     color: var(--text-muted);
     font-size: 0.82rem;
+    flex-shrink: 0;
+  }
+
+  .responsive-data-container td > div {
+    flex: 1;
+    min-width: 0; /* allows text truncation if needed */
   }
 
   .responsive-data-container td:last-child {
