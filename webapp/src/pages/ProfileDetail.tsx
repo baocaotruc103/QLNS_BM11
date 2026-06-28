@@ -211,8 +211,9 @@ export default function ProfileDetail() {
     const rawColumns = [...configuredColumns, ...rowColumns.filter(column => !configuredColumns.includes(column))];
 
     return rawColumns.filter(column => {
-      if (SYSTEM_COLUMNS.includes(column) || column === '__source' || column === 'ma_dinh_danh' || column.startsWith('ma_')) return false;
-      if (tableName === 'nhan_dang' && ['ngay_cap', 'han_dung', 'loai_cap_the'].includes(column)) return false;
+      if (SYSTEM_COLUMNS.includes(column) || column === '__source' || column === 'ma_dinh_danh') return false;
+      if (tableName === 'nhan_dang' && (['ngay_cap', 'han_dung', 'loai_cap_the'].includes(column) || column.endsWith('_ma'))) return false;
+      if (tableName !== 'nhan_dang' && column.startsWith('ma_')) return false;
       if (tableName === PARENT_TABLE) return true;
       return currentDisplayConfig[column] !== false;
     });
@@ -224,8 +225,9 @@ export default function ProfileDetail() {
     const rowColumns = rows.length > 0 ? Object.keys(rows[0]) : [];
     const rawColumns = [...configuredColumns, ...rowColumns.filter(column => !configuredColumns.includes(column))];
     return rawColumns.filter(column => {
-      if (SYSTEM_COLUMNS.includes(column) || column === '__source' || column === 'ma_dinh_danh' || column.startsWith('ma_')) return false;
-      if (tableName === 'nhan_dang' && ['ngay_cap', 'han_dung', 'loai_cap_the'].includes(column)) return false;
+      if (SYSTEM_COLUMNS.includes(column) || column === '__source' || column === 'ma_dinh_danh') return false;
+      if (tableName === 'nhan_dang' && (['ngay_cap', 'han_dung', 'loai_cap_the'].includes(column) || column.endsWith('_ma'))) return false;
+      if (tableName !== 'nhan_dang' && column.startsWith('ma_')) return false;
       return true;
     });
   };
@@ -568,16 +570,34 @@ export default function ProfileDetail() {
 
     setInlineSaving(true);
 
-    const { error } = INLINE_FORM_TABLES.includes(tableName)
-      ? await supabase.from(tableName).upsert(cleanData, { onConflict: 'ma_dinh_danh' })
-      : record?.id
+    let saveError = null;
+    const inlineRecord = getInlineRecord();
+
+    if (INLINE_FORM_TABLES.includes(tableName)) {
+      if (inlineRecord?.id) {
+        const { error } = await supabase.from(tableName).update(cleanData).eq('id', inlineRecord.id);
+        saveError = error;
+      } else {
+        // Try to update by ma_dinh_danh first. If 0 rows updated, then insert.
+        const { data, error } = await supabase.from(tableName).update(cleanData).eq('ma_dinh_danh', id).select();
+        if (error) {
+          saveError = error;
+        } else if (!data || data.length === 0) {
+          const { error: insErr } = await supabase.from(tableName).insert([cleanData]);
+          saveError = insErr;
+        }
+      }
+    } else {
+      const { error } = record?.id
         ? await supabase.from(tableName).update(cleanData).eq('id', record.id)
         : await supabase.from(tableName).insert([cleanData]);
+      saveError = error;
+    }
 
     setInlineSaving(false);
 
-    if (error) {
-      alert('Lỗi khi lưu: ' + error.message);
+    if (saveError) {
+      alert('Lỗi khi lưu: ' + saveError.message);
       return;
     }
 
