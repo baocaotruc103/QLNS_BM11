@@ -213,7 +213,7 @@ export default function ProfileDetail() {
     const rawColumns = [...configuredColumns, ...rowColumns.filter(column => !configuredColumns.includes(column))];
 
     return rawColumns.filter(column => {
-      if (SYSTEM_COLUMNS.includes(column) || column === '__source' || column === 'ma_dinh_danh') return false;
+      if (SYSTEM_COLUMNS.includes(column) || column === '__source' || column === 'ma_dinh_danh' || column === 'so_so_bhyt') return false;
       if (tableName === 'nhan_dang' && (['ngay_cap', 'han_dung', 'loai_cap_the'].includes(column) || column.endsWith('_ma'))) return false;
       if (tableName !== 'nhan_dang' && column.startsWith('ma_')) return false;
       if (tableName === PARENT_TABLE) return true;
@@ -227,7 +227,7 @@ export default function ProfileDetail() {
     const rowColumns = rows.length > 0 ? Object.keys(rows[0]) : [];
     const rawColumns = [...configuredColumns, ...rowColumns.filter(column => !configuredColumns.includes(column))];
     return rawColumns.filter(column => {
-      if (SYSTEM_COLUMNS.includes(column) || column === '__source' || column === 'ma_dinh_danh') return false;
+      if (SYSTEM_COLUMNS.includes(column) || column === '__source' || column === 'ma_dinh_danh' || column === 'so_so_bhyt') return false;
       if (tableName === 'nhan_dang' && (['ngay_cap', 'han_dung', 'loai_cap_the'].includes(column) || column.endsWith('_ma'))) return false;
       if (tableName !== 'nhan_dang' && column.startsWith('ma_')) return false;
       if (tableName === 'luong' && ['thang_nam_bat_dau_nhan_luong', 'thang_nam_tham_gia_bhxh', 'so_so_bhxh', 'che_do_luong'].includes(column)) return false;
