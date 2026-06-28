@@ -64,7 +64,7 @@ export default function Login({ onLogin }: LoginProps) {
             lineHeight: '1.4',
             margin: '0'
           }}>
-            Hệ thống quản lý<br/>Hồ sơ Quân nhân
+            Hệ thống quản lý<br/>Hồ sơ nhân sự
           </h1>
         </div>
 

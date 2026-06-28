@@ -662,6 +662,15 @@ tr:last-child td {
     font-weight: 500;
     font-size: 0.85rem !important;
   }
+
+  .dashboard-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem !important;
+  }
+
+  .dashboard-stats-grid .glass-panel {
+    padding: 1rem !important;
+  }
 }
 
 

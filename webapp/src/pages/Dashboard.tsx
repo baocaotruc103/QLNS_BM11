@@ -157,7 +157,7 @@ export default function Dashboard() {
 
       {/* Quick Statistics - Only on Dashboard */}
       {isDashboard && (
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
+      <div className="dashboard-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
         <div className="glass-panel" style={{ padding: '1.5rem', borderLeft: '4px solid var(--primary)' }}>
           <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.25rem', fontWeight: 600 }}>TỔNG QUÂN SỐ</div>
           <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-main)' }}>{filteredData.length}</div>
