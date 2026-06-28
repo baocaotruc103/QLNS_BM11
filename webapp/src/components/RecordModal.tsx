@@ -339,6 +339,9 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
                     <option value="Tuyển dụng LĐHĐ">Tuyển dụng LĐHĐ</option>
                     <option value="Tuyển dụng QNCN">Tuyển dụng QNCN</option>
                     <option value="Tuyển chọn QNCN">Tuyển chọn QNCN</option>
+                    <option value="HSQ-BS sang QNCN">HSQ-BS sang QNCN</option>
+                    <option value="VCQP sang QNCN">VCQP sang QNCN</option>
+                    <option value="VCQP sang Sỹ quan">VCQP sang Sỹ quan</option>
                     <option value="Tuyển chọn VCQP">Tuyển chọn VCQP</option>
                   </select>
                 ) : col === 'dien_quan_ly' ? (
