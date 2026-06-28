@@ -46,10 +46,17 @@ export default function DataSetting() {
          
          for (const record of records) {
             if (!record.ma_dinh_danh) continue; 
-            const { error } = await supabase.from(importTable).update(record).eq('ma_dinh_danh', record.ma_dinh_danh);
+            const { data, error } = await supabase.from(importTable).update(record).eq('ma_dinh_danh', record.ma_dinh_danh).select();
             
             if (error) {
               console.error(`Lỗi cập nhật mã ${record.ma_dinh_danh}:`, error);
+            } else if (!data || data.length === 0) {
+              const { error: insErr } = await supabase.from(importTable).insert([record]);
+              if (insErr) {
+                console.error(`Lỗi thêm mới mã ${record.ma_dinh_danh}:`, insErr);
+              } else {
+                successCount++;
+              }
             } else {
               successCount++;
             }
