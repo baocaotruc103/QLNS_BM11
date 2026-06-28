@@ -1079,7 +1079,7 @@ export default function ProfileDetail() {
     }
 
     return (
-      <div className="animate-fade-in">
+      <div className={`animate-fade-in ${activeTab === 'bhyt_than_nhan' ? 'bhyt-mobile-card' : ''}`}>
         <DataTable
           title={tableTitle}
           columns={displayColumns}

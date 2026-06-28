@@ -570,6 +570,12 @@ tr:last-child td {
   .responsive-data-container td:last-child {
     border-bottom: 0;
   }
+
+  .bhyt-mobile-card .responsive-data-container td[data-label="STT"],
+  .bhyt-mobile-card .responsive-data-container td[data-label="Định danh & Địa chỉ"],
+  .bhyt-mobile-card .responsive-data-container td[data-label="Ghi chú"] {
+    display: none !important;
+  }
 }
 
 .page-titlebar {
