@@ -96,8 +96,8 @@ export const parseExcelFile = async (file: File): Promise<Record<string, any[]>>
 
                   if (val !== undefined && val !== null && val !== '') {
                     isEmpty = false;
+                    rowObj[keyMap[idx]] = val;
                   }
-                  rowObj[keyMap[idx]] = val;
                 });
 
                 if (!isEmpty) {

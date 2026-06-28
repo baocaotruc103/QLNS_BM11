@@ -143,19 +143,15 @@ export default function Dashboard() {
       for (const table of tablesOrder) {
         if (dataByTable[table] && dataByTable[table].length > 0) {
            const records = dataByTable[table];
-           if (table === PARENT_TABLE) {
-              const { error } = await supabase.from(table).upsert(records, { onConflict: 'ma_dinh_danh' });
+           // Lặp qua từng record để thực hiện cập nhật cục bộ (partial update),
+           // giữ nguyên các cột cũ trong Database nếu Excel để trống.
+           for (const record of records) {
+              if (!record.ma_dinh_danh) continue; // Phải có mã định danh để liên kết
+              const { data, error } = await supabase.from(table).update(record).eq('ma_dinh_danh', record.ma_dinh_danh).select();
               if (error) throw error;
-           } else {
-              // Với bảng khác, lặp qua từng record update, nếu 0 thì insert
-              for (const record of records) {
-                 if (!record.ma_dinh_danh) continue; // Phải có mã định danh để liên kết
-                 const { data, error } = await supabase.from(table).update(record).eq('ma_dinh_danh', record.ma_dinh_danh).select();
-                 if (error) throw error;
-                 if (!data || data.length === 0) {
-                    const { error: insErr } = await supabase.from(table).insert([record]);
-                    if (insErr) throw insErr;
-                 }
+              if (!data || data.length === 0) {
+                 const { error: insErr } = await supabase.from(table).insert([record]);
+                 if (insErr) throw insErr;
               }
            }
         }
