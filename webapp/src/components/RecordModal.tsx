@@ -88,9 +88,67 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
         defaultData.dan_toc = 'Kinh';
         defaultData.ton_giao = 'Không';
       }
-      setFormData(defaultData);
+      
+      if (tableName === 'luong' && maDinhDanh) {
+        supabase
+          .from('luong')
+          .select('loai_ngach, nhom, bac, dien_quan_ly, don_vi_cong_tac, don_vi_cong_tac_chi_tiet')
+          .eq('ma_dinh_danh', maDinhDanh)
+          .order('tu_thang_nam', { ascending: false, nullsFirst: false })
+          .limit(1)
+          .then(({ data }) => {
+            if (data && data.length > 0) {
+              const latest = data[0];
+              const newData = { ...defaultData };
+              if (latest.dien_quan_ly) newData.dien_quan_ly = latest.dien_quan_ly;
+              if (latest.loai_ngach) newData.loai_ngach = latest.loai_ngach;
+              if (latest.nhom) newData.nhom = latest.nhom;
+              if (latest.don_vi_cong_tac) newData.don_vi_cong_tac = latest.don_vi_cong_tac;
+              if (latest.don_vi_cong_tac_chi_tiet) newData.don_vi_cong_tac_chi_tiet = latest.don_vi_cong_tac_chi_tiet;
+              
+              if (latest.bac) {
+                const bacStr = String(latest.bac);
+                const bacMatch = bacStr.match(/(\d+)$/);
+                if (bacMatch) {
+                  const newBacNum = parseInt(bacMatch[1]) + 1;
+                  newData.bac = bacStr.replace(/\d+$/, String(newBacNum));
+                }
+              }
+              
+              // Apply rules if available
+              if (luongRules && newData.dien_quan_ly && newData.loai_ngach && newData.nhom && newData.bac) {
+                const nhomStr = newData.nhom.includes('Nhóm') ? newData.nhom : `Nhóm ${newData.nhom}`;
+                const bacNum = parseInt(newData.bac);
+                const rule = luongRules.he_so_luong?.find((r: any) => 
+                  r.doi_tuong_luong === 'Quân nhân chuyên nghiệp' &&
+                  r.loai_ngach === newData.loai_ngach &&
+                  r.nhom_luong === nhomStr &&
+                  r.bac_luong === bacNum
+                );
+                
+                if (rule && rule.he_so_luong) {
+                  newData.he_so_quy_doi = rule.he_so_luong;
+                  const qhRule = luongRules.quan_ham_theo_he_so?.find((r: any) => 
+                    (r.doi_tuong_luong === 'Quân nhân chuyên nghiệp' || r.doi_tuong_luong === 'Quân nhân chuyên nghiệp (theo hệ số)') &&
+                    rule.he_so_luong >= r.he_so_tu &&
+                    (r.he_so_den_duoi === null || rule.he_so_luong < r.he_so_den_duoi)
+                  );
+                  if (qhRule) {
+                    newData.cap_bac = qhRule.cap_bac_hien_tai;
+                  }
+                }
+              }
+
+              setFormData(newData);
+            } else {
+              setFormData(defaultData);
+            }
+          });
+      } else {
+        setFormData(defaultData);
+      }
     }
-  }, [mode, record, maDinhDanh, tableName]);
+  }, [mode, record, maDinhDanh, tableName, luongRules]);
 
   const handleChange = (col: string, val: string) => {
     setFormData((prev: any) => {
@@ -259,6 +317,44 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
                     placeholder={`Chọn ${formatLabel(col).toLowerCase()}...`}
                     disabled={false}
                   />
+                ) : ['tinh_tham_nien', 'tinh_huong_tro_cap', 'tinh_dong_bhxh'].includes(col) ? (
+                  <select
+                    className="form-control"
+                    value={formData[col] || ''}
+                    onChange={e => handleChange(col, e.target.value)}
+                    disabled={false}
+                  >
+                    <option value="">Chọn...</option>
+                    <option value="Có">Có</option>
+                    <option value="Không">Không</option>
+                  </select>
+                ) : col === 'che_do_luong' ? (
+                  <select
+                    className="form-control"
+                    value={formData[col] || ''}
+                    onChange={e => handleChange(col, e.target.value)}
+                    disabled={false}
+                  >
+                    <option value="">Chọn chế độ...</option>
+                    <option value="Tuyển dụng LĐHĐ">Tuyển dụng LĐHĐ</option>
+                    <option value="Tuyển dụng QNCN">Tuyển dụng QNCN</option>
+                    <option value="Tuyển chọn QNCN">Tuyển chọn QNCN</option>
+                    <option value="Tuyển chọn VCQP">Tuyển chọn VCQP</option>
+                  </select>
+                ) : col === 'dien_quan_ly' ? (
+                  <select
+                    className="form-control"
+                    value={formData[col] || ''}
+                    onChange={e => handleChange(col, e.target.value)}
+                    disabled={false}
+                  >
+                    <option value="">Chọn diện quản lý...</option>
+                    <option value="Sĩ quan">Sĩ quan</option>
+                    <option value="Quân nhân chuyên nghiệp">Quân nhân chuyên nghiệp (QNCN)</option>
+                    <option value="Công nhân quốc phòng">Công nhân quốc phòng (CNQP)</option>
+                    <option value="Viên chức quốc phòng">Viên chức quốc phòng (VCQP)</option>
+                    <option value="Hạ sĩ quan, Binh sĩ">Hạ sĩ quan, Binh sĩ</option>
+                  </select>
                 ) : col === 'tinh_trang_hon_nhan' ? (
                   <select
                     className="form-control"

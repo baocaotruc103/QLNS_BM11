@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
-import { ArrowLeft, Edit, Plus, Save, UserCircle, X, Camera } from 'lucide-react';
+import { ArrowLeft, Edit, Plus, Save, UserCircle, X, Camera, FileText } from 'lucide-react';
 import DataTable from '../components/DataTable';
+import RecordModal from '../components/RecordModal';
 import { extractDataFromImage } from '../lib/aiService';
 
 import LocationSelect from '../components/LocationSelect';
@@ -107,6 +108,7 @@ export default function ProfileDetail() {
   const [inlineEditing, setInlineEditing] = useState(false);
   const [inlineSaving, setInlineSaving] = useState(false);
   const [inlineFormData, setInlineFormData] = useState<any>({});
+  const [showLuongSummaryModal, setShowLuongSummaryModal] = useState(false);
   
   const [extracting, setExtracting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -951,6 +953,61 @@ export default function ProfileDetail() {
         if (key === 'bac_hien_thi') return 'Bậc';
         return formatFieldLabel(key);
       };
+
+      return (
+        <div className="animate-fade-in training-tab-content">
+          <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '1.5rem', borderLeft: '4px solid #10b981' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <FileText size={18} className="text-emerald-500" /> Thông tin chung về Lương & BHXH
+              </h3>
+              <button className="btn btn-outline" style={{ padding: '0.35rem 0.75rem', fontSize: '0.875rem' }} onClick={() => setShowLuongSummaryModal(true)}>
+                <Edit size={14} style={{ marginRight: '0.35rem' }} /> Sửa thông tin chung
+              </button>
+            </div>
+            <div className="info-grid">
+              {['thang_nam_bat_dau_nhan_luong', 'thang_nam_tham_gia_bhxh', 'so_so_bhxh', 'che_do_luong'].map(col => (
+                <div className="info-item" key={col}>
+                  <div className="info-label">{formatFieldLabel(col)}</div>
+                  <div className="info-value" style={{ fontWeight: 500, color: 'var(--primary)' }}>{profile?.[col] || '-'}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <DataTable
+            title={tableTitle}
+            columns={displayColumns}
+            data={displayData}
+            formatLabel={finalFormatLabel}
+            onAdd={() => handleTableAction('add')}
+            onEdit={(row) => handleTableAction('edit', row)}
+            onDelete={(row) => handleDelete(row)}
+            onView={(row) => handleTableAction('view', row)}
+            actionState={modalState}
+            actionRowId={selectedRecord?.id}
+            renderInlineAction={renderTableInlineAction}
+          />
+
+          {showLuongSummaryModal && (
+            <RecordModal
+              mode={profile ? 'edit' : 'add'}
+              tableName={PARENT_TABLE}
+              columns={['thang_nam_bat_dau_nhan_luong', 'thang_nam_tham_gia_bhxh', 'so_so_bhxh', 'che_do_luong']}
+              record={profile}
+              maDinhDanh={id}
+              formatLabel={formatFieldLabel}
+              onClose={() => setShowLuongSummaryModal(false)}
+              onRefresh={() => {
+                if (id) {
+                  fetchProfile(id);
+                  fetchTabData(activeTab, id);
+                }
+              }}
+            />
+          )}
+        </div>
+      );
     } else if (activeTab === 'thong_tin_nhan_than') {
       displayColumns = ['moi_quan_he', 'ho_ten', 'nam_sinh', 'nghe_nghiep', 'trang_thai', 'dia_ban', 'noi_o_chi_tiet'];
       displayData = tabData.map(row => ({
