@@ -53,16 +53,26 @@ export default function DataSetting() {
                if (error) console.error(`Lỗi cập nhật ID ${record.id}:`, error);
                else successCount++;
             } else {
-               // Không có ID, kiểm tra xem có an toàn để update không
-               const { data } = await supabase.from(importTable).select('id').eq('ma_dinh_danh', record.ma_dinh_danh);
-               
-               if (data && data.length === 1) {
-                  // Chỉ có 1 bản ghi (bảng 1-1), an toàn để update
-                  const { error } = await supabase.from(importTable).update(record).eq('id', data[0].id);
-                  if (error) console.error(`Lỗi cập nhật mã ${record.ma_dinh_danh}:`, error);
-                  else successCount++;
+               // Không có ID, phân biệt bảng 1-1 và bảng 1-n
+               const ONE_TO_ONE_TABLES = ['thong_tin_quan_nhan', 'thong_tin_chung', 'nhan_dang'];
+               const isOneToOne = ONE_TO_ONE_TABLES.includes(importTable);
+
+               if (isOneToOne) {
+                  const { data } = await supabase.from(importTable).select('id').eq('ma_dinh_danh', record.ma_dinh_danh);
+                  
+                  if (data && data.length > 0) {
+                     // Bảng 1-1 đã tồn tại bản ghi, an toàn để update
+                     const { error } = await supabase.from(importTable).update(record).eq('id', data[0].id);
+                     if (error) console.error(`Lỗi cập nhật mã ${record.ma_dinh_danh}:`, error);
+                     else successCount++;
+                  } else {
+                     // Bảng 1-1 chưa tồn tại -> Thêm mới
+                     const { error: insErr } = await supabase.from(importTable).insert([record]);
+                     if (insErr) console.error(`Lỗi thêm mới mã ${record.ma_dinh_danh}:`, insErr);
+                     else successCount++;
+                  }
                } else {
-                  // Chưa có bản ghi nào hoặc có nhiều bản ghi (bảng 1-n) -> Bắt buộc thêm mới để không ghi đè mất dữ liệu
+                  // Bảng 1-n (như BHYT Thân nhân, Gia đình...) chưa truyền ID thì luôn luôn INSERT
                   const { error: insErr } = await supabase.from(importTable).insert([record]);
                   if (insErr) console.error(`Lỗi thêm mới mã ${record.ma_dinh_danh}:`, insErr);
                   else successCount++;
