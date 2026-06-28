@@ -109,7 +109,13 @@ export default function Dashboard() {
            (person.ma_dinh_danh?.toLowerCase() || '').includes(searchTerm.toLowerCase());
   });
 
-  const officerCount = filteredData.filter(p => p.chuc_vu && (p.chuc_vu.includes('Bác sỹ') || p.chuc_vu.includes('Học viên BSNY') || p.chuc_vu.includes('Bác sĩ'))).length;
+  const officerCount = filteredData.filter(p => p.chuc_vu && (
+    p.chuc_vu.includes('Bác sỹ') || 
+    p.chuc_vu.includes('Bác sĩ') || 
+    p.chuc_vu.includes('Học viên BSNT') || 
+    p.chuc_vu.includes('Học viên BSNY') ||
+    p.chuc_vu.toLowerCase().includes('chủ nhiệm khoa')
+  )).length;
   const qncnCount = filteredData.filter(p => p.chuc_vu && (p.chuc_vu.includes('Điều dưỡng viên') || p.chuc_vu.includes('Điều dưỡng trưởng')) && p.cap_bac !== 'LĐHĐ').length;
   const ldhdCount = filteredData.filter(p => p.cap_bac === 'LĐHĐ').length;
 
