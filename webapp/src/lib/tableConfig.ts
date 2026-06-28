@@ -113,7 +113,7 @@ export const TABLES = [
     id: 'bhyt_than_nhan',
     label: 'BHYT Thân nhân',
     icon: Users,
-    columns: ['ma_dinh_danh', 'ho_ten', 'moi_quan_he', 'ngay_thang_nam_sinh', 'gioi_tinh', 'dan_toc', 'ma_so_bhxh', 'so_cccd', 'noi_cap_cccd', 'noi_dang_ky_kcb', 'so_dien_thoai', 'que_quan_tinh', 'que_quan_xa', 'thuong_tru_tinh', 'thuong_tru_xa', 'ghi_chu'],
+    columns: ['ma_dinh_danh', 'ho_ten', 'moi_quan_he', 'ngay_thang_nam_sinh', 'gioi_tinh', 'dan_toc', 'ma_so_bhxh', 'so_cccd', 'noi_cap_cccd', 'noi_dang_ky_kcb', 'so_dien_thoai', 'que_quan_tinh', 'que_quan_xa', 'thuong_tru_tinh', 'thuong_tru_xa', 'ngay_han_sd_bhyt_tu', 'ngay_han_sd_bhyt_den', 'ghi_chu'],
   },
 ];
 
