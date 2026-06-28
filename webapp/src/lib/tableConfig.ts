@@ -173,7 +173,6 @@ export const formatFieldLabel = (key: string) => {
     ho_va_ten: 'Họ và tên',
     ho_ten: 'Họ tên thân nhân',
     nam_sinh: 'Năm sinh',
-    ngay_thang_nam_sinh: 'Ngày tháng năm sinh thân nhân',
     nghe_nghiep: 'Nghề nghiệp',
     noi_o_hien_nay: 'Nơi ở hiện nay',
     dia_chi_chi_tiet: 'Địa chỉ chi tiết',
@@ -250,13 +249,9 @@ export const formatFieldLabel = (key: string) => {
     tinh_dong_bhxh: 'Tính đóng BHXH',
     don_vi_cong_tac_chi_tiet: 'Đơn vị công tác chi tiết',
     ma_so_bhxh: 'Mã số BHXH (10 số cuối thẻ BHYT)',
-    so_cccd: 'Số CC/CCCD',
-    noi_cap_cccd: 'Nơi cấp',
-    noi_dang_ky_kcb: 'Nơi KCB',
     so_dien_thoai: 'Số điện thoại',
     que_quan_tinh: 'Tỉnh/Thành (Quê quán)',
     que_quan_xa: 'Xã/Phường (Quê quán)',
-    ghi_chu: 'Nội dung đề nghị',
   };
 
   return labels[key] || key.replace(/_/g, ' ').replace(/(^\w|\s\w)/g, value => value.toUpperCase());

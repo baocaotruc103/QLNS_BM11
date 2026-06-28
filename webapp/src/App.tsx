@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
-import { Shield, LogOut, Menu, ChevronLeft, ChevronRight, User, Key } from 'lucide-react';
+import { LogOut, Menu, ChevronLeft, ChevronRight, User, Key } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import ProfileDetail from './pages/ProfileDetail';
 import UsersSetting from './pages/settings/UsersSetting';

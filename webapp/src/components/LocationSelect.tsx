@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import provincesData from '../../province.json';
 import wardsData from '../../ward.json';
 

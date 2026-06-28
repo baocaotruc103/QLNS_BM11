@@ -821,7 +821,7 @@ export default function ProfileDetail() {
       );
     }
 
-    const editableColumns = getEditableColumnsForTable(activeTab, tabData);
+    // const editableColumns = getEditableColumnsForTable(activeTab, tabData);
 
     if (INLINE_FORM_TABLES.includes(activeTab)) {
       const record = getInlineRecord();

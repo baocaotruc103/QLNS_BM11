@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { Link, useLocation } from 'react-router-dom';
-import { Save, Users, Eye, Shield, X } from 'lucide-react';
+import { Save, Users, Eye, Shield } from 'lucide-react';
 import DataTable from '../../components/DataTable';
 
 type UserRecord = {
