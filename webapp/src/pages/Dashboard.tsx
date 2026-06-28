@@ -14,6 +14,7 @@ const mapLegacyProfile = (item: any) => ({
   thang_nam_vao_quan_doi: item.thang_nam_nhap_ngu,
   thang_nam_ve_khoa_cong_tac: item.thang_nam_ve_khoa_cong_tac,
   trang_thai_xuat_ngu: item.trang_thai_xuat_ngu,
+  ngay_vao_dang: item.ngay_vao_dang,
   __source: 'legacy',
 });
 
@@ -32,6 +33,20 @@ export default function Dashboard() {
 
   const parentConfig = getTableConfig(PARENT_TABLE);
   const parentColumns = parentConfig ? parentConfig.columns.filter(c => !['id', 'created_at', 'updated_at'].includes(c)) : [];
+  
+  const formatDateVal = (val: any) => {
+    if (val === null || val === undefined || val === '') return val;
+    const str = String(val);
+    if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+      const match = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (match) return `${match[3]}/${match[2]}/${match[1]}`;
+    } else if (/^\d{4}-\d{2}/.test(str) && str.length === 7) {
+      const match = str.match(/^(\d{4})-(\d{2})/);
+      if (match) return `${match[2]}/${match[1]}`;
+    }
+    return val;
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -59,7 +74,7 @@ export default function Dashboard() {
       .order('ho_va_ten_khai_sinh', { ascending: true })
       .limit(100);
 
-    if (result && !error) {
+    if (result && !error && result.length > 0) {
       // Map the joined thong_tin_chung data up to the parent object
       const mappedResult = result.map((item: any) => {
         let ngay_vao_dang = null;
@@ -204,8 +219,8 @@ export default function Dashboard() {
                       <td data-label="Cấp bậc">{person.cap_bac || '-'}</td>
                       <td data-label="Chức vụ">{person.chuc_vu || '-'}</td>
                       <td data-label="Đơn vị">{person.don_vi || '-'}</td>
-                      <td data-label="Về khoa công tác">{person.thang_nam_ve_khoa_cong_tac || '-'}</td>
-                      {isDangVien && <td data-label="Ngày vào Đảng">{person.ngay_vao_dang || '-'}</td>}
+                      <td data-label="Về khoa công tác">{formatDateVal(person.thang_nam_ve_khoa_cong_tac) || '-'}</td>
+                      {isDangVien && <td data-label="Ngày vào Đảng">{formatDateVal(person.ngay_vao_dang) || '-'}</td>}
                     </tr>
                   ))
                 )}
