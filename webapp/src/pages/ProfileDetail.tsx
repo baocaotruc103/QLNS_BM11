@@ -681,7 +681,7 @@ export default function ProfileDetail() {
           const isAddress = key.includes('_tinh') || key.includes('_xa') || key.includes('_chi_tiet') || key === 'tinh_tp' || key === 'xa_phuong' || key === 'noi_o_chi_tiet';
 
           return (
-            <div className={`form-group ${isAddress ? 'address-field' : ''}`} key={key} style={{ marginBottom: 0 }}>
+            <div className={`form-group ${isAddress ? 'address-field' : ''} ${!isCurrentlyEditing ? 'readonly-group' : ''}`} key={key} style={{ marginBottom: 0 }}>
               <span className="form-label">{renderLabel(formatFieldLabel(key))}</span>
               {isCurrentlyEditing ? (
                 renderInlineInput(key)
