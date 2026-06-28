@@ -150,6 +150,18 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
     }
   }, [mode, record, maDinhDanh, tableName, luongRules]);
 
+  const mapDienQuanLyToSubjectType = (d: string) => {
+    if (!d) return null;
+    if (d.includes('Sĩ quan')) return 'SQ';
+    if (d.includes('Quân nhân chuyên nghiệp') || d === 'QNCN') return 'QNCN';
+    if (d.includes('Công nhân quốc phòng')) return 'CNQP';
+    if (d.includes('Viên chức quốc phòng')) return 'VCQP';
+    if (d === 'Viên chức') return 'VC';
+    if (d.includes('Lao động hợp đồng') || d.includes('LĐHĐ')) return 'LDHD';
+    if (d.includes('Hạ sĩ quan, Binh sĩ')) return 'HSQBS';
+    return null;
+  };
+
   const handleChange = (col: string, val: string) => {
     setFormData((prev: any) => {
       const next = { ...prev, [col]: val };
@@ -157,20 +169,7 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
       // Tự động điền Hệ số và Quân hàm cho bảng lương
       if ((tableName === 'luong' || tableName === 'qua_trinh_luong') && luongRules?.salary_tables) {
         const dienQuanLy = next.dien_quan_ly;
-        
-        const mapDienQuanLy = (d: string) => {
-            if (!d) return null;
-            if (d.includes('Sĩ quan')) return 'SQ';
-            if (d.includes('Quân nhân chuyên nghiệp') || d === 'QNCN') return 'QNCN';
-            if (d.includes('Công nhân quốc phòng')) return 'CNQP';
-            if (d.includes('Viên chức quốc phòng')) return 'VCQP';
-            if (d === 'Viên chức') return 'VC';
-            if (d.includes('Lao động hợp đồng') || d.includes('LĐHĐ')) return 'LDHD';
-            if (d.includes('Hạ sĩ quan, Binh sĩ')) return 'HSQBS';
-            return null;
-        };
-
-        const subjectType = mapDienQuanLy(dienQuanLy);
+        const subjectType = mapDienQuanLyToSubjectType(dienQuanLy);
         if (subjectType && (next.loai_ngach || next.nhom || next.cap_bac) && next.bac) {
             const bacMatch = String(next.bac).match(/\d+/);
             const bacNum = bacMatch ? parseInt(bacMatch[0]) : 1;
@@ -394,6 +393,30 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
                     <option value="Viên chức quốc phòng">Viên chức quốc phòng (VCQP)</option>
                     <option value="Hạ sĩ quan, Binh sĩ">Hạ sĩ quan, Binh sĩ</option>
                     <option value="Lao động hợp đồng">Lao động hợp đồng (LĐHĐ)</option>
+                  </select>
+                ) : col === 'loai_ngach' && luongRules?.fields?.salary_class?.options_by_subject_type?.[mapDienQuanLyToSubjectType(formData.dien_quan_ly) || ''] ? (
+                  <select
+                    className="form-control"
+                    value={formData[col] || ''}
+                    onChange={e => handleChange(col, e.target.value)}
+                    disabled={false}
+                  >
+                    <option value="">Chọn loại/ngạch...</option>
+                    {luongRules.fields.salary_class.options_by_subject_type[mapDienQuanLyToSubjectType(formData.dien_quan_ly)!].map((opt: string) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                ) : col === 'nhom' && luongRules?.fields?.salary_group?.options_by_salary_class?.[formData.loai_ngach] ? (
+                  <select
+                    className="form-control"
+                    value={formData[col] || ''}
+                    onChange={e => handleChange(col, e.target.value)}
+                    disabled={false}
+                  >
+                    <option value="">Chọn nhóm...</option>
+                    {luongRules.fields.salary_group.options_by_salary_class[formData.loai_ngach].map((opt: any) => (
+                        <option key={opt.code} value={opt.label}>{opt.label}</option>
+                    ))}
                   </select>
                 ) : col === 'tinh_trang_hon_nhan' ? (
                   <select
