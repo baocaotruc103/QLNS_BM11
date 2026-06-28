@@ -283,7 +283,7 @@ export default function ProfileDetail() {
     setInlineFormData((prev: any) => {
       const next = { ...prev, [key]: value };
       if (key === 'so_the_bhyt' && value && value.length >= 10) {
-        next.so_so_bhyt = value.slice(-10);
+        next.so_so_bhxh = value.slice(-10);
       }
       if (key === 'ngay_cap_cccd' && value && value.length === 10) {
         const autoNoiCap = getNoiCapCccd(value);
@@ -726,9 +726,9 @@ export default function ProfileDetail() {
       const rawData = record || { ma_dinh_danh: id };
       const cloned = { ...rawData };
       
-      // Auto-fill so_so_bhxh from profile's so_so_bhyt when adding a new record in luong table
+      // Auto-fill so_so_bhxh from profile's so_so_bhxh when adding a new record in luong table
       if (action === 'add' && activeTab === 'luong') {
-        cloned.so_so_bhxh = profile?.so_so_bhyt || '';
+        cloned.so_so_bhxh = profile?.so_so_bhxh || '';
       }
       
       if (action === 'add' && activeTab === SUC_KHOE_TABLE && nhanDang?.chieu_cao_m) {

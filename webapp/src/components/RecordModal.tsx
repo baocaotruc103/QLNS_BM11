@@ -233,7 +233,7 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
       }
 
       if (col === 'so_the_bhyt' && val && val.length >= 10) {
-        next.so_so_bhyt = val.slice(-10);
+        next.so_so_bhxh = val.slice(-10);
       }
       if (col === 'ngay_cap_cccd' && val && val.length === 10) {
         const autoNoiCap = getNoiCapCccd(val);
