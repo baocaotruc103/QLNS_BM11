@@ -73,36 +73,32 @@ export default function DataSetting() {
                   }
                } else {
                   // Bảng 1-n, xử lý khi không truyền ID (tìm theo trường định danh phụ để tránh trùng lặp)
-                  let lookupColumn = null;
-                  let lookupValue = null;
+                  let lookupCriteria: Record<string, any> = {};
 
                   if (['bhyt_than_nhan', 'thong_tin_nhan_than'].includes(importTable) && record.ho_ten) {
-                    lookupColumn = 'ho_ten';
-                    lookupValue = record.ho_ten;
+                    lookupCriteria['ho_ten'] = record.ho_ten;
                   } else if (importTable === 'luong' && record.thang_nam_bat_dau) {
-                    lookupColumn = 'thang_nam_bat_dau';
-                    lookupValue = record.thang_nam_bat_dau;
+                    lookupCriteria['thang_nam_bat_dau'] = record.thang_nam_bat_dau;
                   } else if (importTable === 'suc_khoe' && record.thoi_gian) {
-                    lookupColumn = 'thoi_gian';
-                    lookupValue = record.thoi_gian;
+                    lookupCriteria['thoi_gian'] = record.thoi_gian;
                   } else if (importTable === 'danh_gia_nhiem_vu' && record.nam) {
-                    lookupColumn = 'nam';
-                    lookupValue = record.nam;
-                  } else if (importTable === 'khen_thuong' && record.nam) {
-                    lookupColumn = 'nam';
-                    lookupValue = record.nam;
-                  } else if (importTable === 'ky_luat' && record.nam) {
-                    lookupColumn = 'nam';
-                    lookupValue = record.nam;
+                    lookupCriteria['nam'] = record.nam;
+                  } else if (['khen_thuong', 'ky_luat'].includes(importTable) && record.thoi_gian) {
+                    lookupCriteria['thoi_gian'] = record.thoi_gian;
+                    if (record.hinh_thuc) lookupCriteria['hinh_thuc'] = record.hinh_thuc;
                   } else if (importTable === 'thong_tin_dao_tao' && record.thang_nam_bat_dau) {
-                    lookupColumn = 'thang_nam_bat_dau';
-                    lookupValue = record.thang_nam_bat_dau;
+                    lookupCriteria['thang_nam_bat_dau'] = record.thang_nam_bat_dau;
                   }
 
-                  if (lookupColumn && lookupValue !== undefined && lookupValue !== null) {
-                    const { data } = await supabase.from(importTable).select('id').eq('ma_dinh_danh', record.ma_dinh_danh).eq(lookupColumn, lookupValue);
+                  if (Object.keys(lookupCriteria).length > 0) {
+                    let query = supabase.from(importTable).select('id').eq('ma_dinh_danh', record.ma_dinh_danh);
+                    for (const [key, value] of Object.entries(lookupCriteria)) {
+                       query = query.eq(key, value);
+                    }
+                    
+                    const { data } = await query;
                     if (data && data.length > 0) {
-                      // Tồn tại bản ghi trùng khớp -> Cập nhật
+                      // Tồn tại bản ghi trùng khớp -> Cập nhật (lấy bản ghi đầu tiên nếu rủi ro trùng nhiều)
                       const { error } = await supabase.from(importTable).update(record).eq('id', data[0].id);
                       if (error) console.error(`Lỗi cập nhật ${importTable}:`, error);
                       else successCount++;
