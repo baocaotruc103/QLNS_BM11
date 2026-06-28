@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { Link, useLocation } from 'react-router-dom';
-import { Save, Users, Eye, Shield } from 'lucide-react';
+import { Save, Users, Eye, Shield, Briefcase } from 'lucide-react';
 import DataTable from '../../components/DataTable';
 
 type UserRecord = {
@@ -26,6 +26,7 @@ export const SettingsTabs = () => {
     { id: 'users', label: 'Quản lý người dùng', path: '/settings/users', icon: Users },
     { id: 'display', label: 'Cấu hình hiển thị', path: '/settings/display', icon: Eye },
     { id: 'permissions', label: 'Phân quyền', path: '/settings/permissions', icon: Shield },
+    { id: 'positions', label: 'Danh mục chức vụ', path: '/settings/positions', icon: Briefcase },
   ];
 
   return (
