@@ -168,14 +168,24 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
           }
         } 
         // Xử lý cho Quân nhân chuyên nghiệp
-        else if ((dienQuanLy === 'Quân nhân chuyên nghiệp' || dienQuanLy === 'QNCN') && ['loai_ngach', 'nhom', 'bac', 'dien_quan_ly'].includes(col)) {
+        else if ((dienQuanLy === 'Quân nhân chuyên nghiệp' || dienQuanLy === 'QNCN' || dienQuanLy === 'Quân nhân chuyên nghiệp (QNCN)') && ['loai_ngach', 'nhom', 'bac', 'dien_quan_ly'].includes(col)) {
           if (next.loai_ngach && next.nhom && next.bac) {
-            const nhomStr = next.nhom.includes('Nhóm') ? next.nhom : `Nhóm ${next.nhom}`;
+            let normalizedNgach = next.loai_ngach;
+            if (normalizedNgach === 'Cao cấp') normalizedNgach = 'QNCN cao cấp';
+            if (normalizedNgach === 'Trung cấp') normalizedNgach = 'QNCN trung cấp';
+            if (normalizedNgach === 'Sơ cấp') normalizedNgach = 'QNCN sơ cấp';
+
+            let nhomStr = next.nhom.includes('Nhóm') ? next.nhom : `Nhóm ${next.nhom}`;
+            if (nhomStr.toLowerCase().includes('cao cấp nhóm')) nhomStr = nhomStr.replace(/cao cấp/i, '').trim();
+            if (nhomStr.toLowerCase().includes('trung cấp nhóm')) nhomStr = nhomStr.replace(/trung cấp/i, '').trim();
+            if (nhomStr.toLowerCase().includes('sơ cấp nhóm')) nhomStr = nhomStr.replace(/sơ cấp/i, '').trim();
+            nhomStr = nhomStr.charAt(0).toUpperCase() + nhomStr.slice(1); // Ensure "Nhóm X" format
+
             const bacNum = parseInt(next.bac);
             
             const rule = luongRules.he_so_luong?.find((r: any) => 
               r.doi_tuong_luong === 'Quân nhân chuyên nghiệp' &&
-              r.loai_ngach === next.loai_ngach &&
+              r.loai_ngach === normalizedNgach &&
               r.nhom_luong === nhomStr &&
               r.bac_luong === bacNum
             );
@@ -357,6 +367,7 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
                     <option value="Công nhân quốc phòng">Công nhân quốc phòng (CNQP)</option>
                     <option value="Viên chức quốc phòng">Viên chức quốc phòng (VCQP)</option>
                     <option value="Hạ sĩ quan, Binh sĩ">Hạ sĩ quan, Binh sĩ</option>
+                    <option value="Lao động hợp đồng">Lao động hợp đồng (LĐHĐ)</option>
                   </select>
                 ) : col === 'tinh_trang_hon_nhan' ? (
                   <select

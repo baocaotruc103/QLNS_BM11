@@ -230,6 +230,7 @@ export default function ProfileDetail() {
       if (SYSTEM_COLUMNS.includes(column) || column === '__source' || column === 'ma_dinh_danh') return false;
       if (tableName === 'nhan_dang' && (['ngay_cap', 'han_dung', 'loai_cap_the'].includes(column) || column.endsWith('_ma'))) return false;
       if (tableName !== 'nhan_dang' && column.startsWith('ma_')) return false;
+      if (tableName === 'luong' && ['thang_nam_bat_dau_nhan_luong', 'thang_nam_tham_gia_bhxh', 'so_so_bhxh', 'che_do_luong'].includes(column)) return false;
       return true;
     });
   };
@@ -442,6 +443,7 @@ export default function ProfileDetail() {
           <option value="Công nhân quốc phòng">Công nhân quốc phòng (CNQP)</option>
           <option value="Viên chức quốc phòng">Viên chức quốc phòng (VCQP)</option>
           <option value="Hạ sĩ quan, Binh sĩ">Hạ sĩ quan, Binh sĩ</option>
+          <option value="Lao động hợp đồng">Lao động hợp đồng (LĐHĐ)</option>
         </select>
       );
     }
