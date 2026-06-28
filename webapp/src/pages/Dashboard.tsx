@@ -26,6 +26,7 @@ export default function Dashboard() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [unitFilter, setUnitFilter] = useState('Tất cả');
   const [usingLegacyData, setUsingLegacyData] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
 
@@ -87,13 +88,14 @@ export default function Dashboard() {
 
   const filteredData = data.filter(person => {
     if (isDangVien && !person.ngay_vao_dang) return false;
+    if (unitFilter !== 'Tất cả' && person.don_vi !== unitFilter) return false;
     return (person.ho_va_ten_khai_sinh?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
            (person.ma_dinh_danh?.toLowerCase() || '').includes(searchTerm.toLowerCase());
   });
 
-  const officerCount = data.filter(p => p.cap_bac && (p.cap_bac.includes('Úy') || p.cap_bac.includes('Tá') || p.cap_bac.includes('Tướng')) && !p.cap_bac.includes('CN')).length;
-  const qncnCount = data.filter(p => p.cap_bac && p.cap_bac.includes('CN')).length;
-  const hsqbsCount = data.filter(p => p.cap_bac && (p.cap_bac.includes('Binh') || p.cap_bac.includes('Hạ sĩ') || p.cap_bac.includes('Trung sĩ') || p.cap_bac.includes('Thượng sĩ'))).length;
+  const officerCount = filteredData.filter(p => p.cap_bac && (p.cap_bac.includes('Úy') || p.cap_bac.includes('Tá') || p.cap_bac.includes('Tướng')) && !p.cap_bac.includes('CN')).length;
+  const qncnCount = filteredData.filter(p => p.cap_bac && p.cap_bac.includes('CN')).length;
+  const hsqbsCount = filteredData.filter(p => p.cap_bac && (p.cap_bac.includes('Binh') || p.cap_bac.includes('Hạ sĩ') || p.cap_bac.includes('Trung sĩ') || p.cap_bac.includes('Thượng sĩ') || p.cap_bac.includes('LĐHĐ'))).length;
 
   return (
     <div className="animate-fade-in">
@@ -106,12 +108,25 @@ export default function Dashboard() {
             {usingLegacyData ? 'Đang hiển thị dữ liệu từ bảng thông tin chung. Cần chạy SQL đồng bộ để chuyển sang bảng cha mới.' : (isDashboard ? 'Tổng hợp số liệu nhân sự' : (isDangVien ? 'Danh sách đảng viên từ bảng thông tin nhân sự' : 'Danh sách hồ sơ từ bảng thông tin nhân sự'))}
           </p>
         </div>
-        {!isDashboard && (
-          <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-            <Plus size={18} />
-            Thêm mới hồ sơ
-          </button>
-        )}
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <select 
+            className="form-control" 
+            value={unitFilter}
+            onChange={(e) => setUnitFilter(e.target.value)}
+            style={{ minWidth: '200px' }}
+          >
+            <option value="Tất cả">Tất cả các đơn vị</option>
+            <option value="B11">B11</option>
+            <option value="B16">B16</option>
+            <option value="A27">A27</option>
+          </select>
+          {!isDashboard && (
+            <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+              <Plus size={18} />
+              Thêm mới hồ sơ
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Quick Statistics - Only on Dashboard */}
@@ -119,7 +134,7 @@ export default function Dashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
         <div className="glass-panel" style={{ padding: '1.5rem', borderLeft: '4px solid var(--primary)' }}>
           <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.25rem', fontWeight: 600 }}>TỔNG QUÂN SỐ</div>
-          <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-main)' }}>{data.length}</div>
+          <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-main)' }}>{filteredData.length}</div>
         </div>
         <div className="glass-panel" style={{ padding: '1.5rem', borderLeft: '4px solid #10b981' }}>
           <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.25rem', fontWeight: 600 }}>SĨ QUAN</div>
