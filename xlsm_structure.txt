@@ -1,0 +1,60 @@
+=== Sheet: 1.Thông tin chung_HSQN ===
+Row 1: A: THÔNG TIN QNCN (* Là trường thông tin bắt buộc phải nhập)
+Row 2: A: STT, B: Mã định danh quân nhân *, C: Khối quân *, D: Mã khối quân *, E: Họ tên thường dùng *, F: Tình trạng hôn nhân *, G: Mã tình trạng hôn nhân *, H: Tỉnh/TP *
+(Nơi thường trú), I: Xã/Phường/TT *
+(Nơi thường trú), J: Nơi thường trú *, K: Nơi thường trú chi tiết *, L: Tỉnh/TP
+(Nơi tạm trú), M: Xã/Phường/TT
+(Nơi tạm trú), N: Nơi tạm trú, O: Nơi tạm trú chi tiết, P: Tỉnh/TP
+(Nơi ở hiện tại), Q: Xã/Phường/TT
+(Nơi ở hiện tại), R: Nơi ở hiện tại, S: Nơi ở hiện tại chi tiết , T: Tháng năm nhập ngũ *, U: Tháng năm tuyển dụng, V: Tháng năm xuất ngũ, W: Tháng năm tái ngũ, X: HSQ-BS sang QNCN tháng năm, Y: HSQ-BS sang CNVQP tháng năm, Z: CNVQP sang QNCN tháng năm, AA: Ngày vào Đoàn TNCS Hồ Chí Minh, AB: Ngày vào Đảng CSVN, AC: Ngày chính thức, AD: Tháng năm chuẩn bị nghỉ hưu, AE: Tháng năm nhận sổ, AF: Trạng thái xuất ngũ, AG: Mã trạng thái xuất ngũ, AH: Trạng thái dữ liệu cấp 2
+
+=== Sheet: 2.Thông tin đào tạo ===
+Row 1: A: THÔNG TIN ĐÀO TẠO (* Là trường thông tin bắt buộc phải nhập)
+Row 2: A: STT, B: Mã định danh quân nhân *, C: Trình độ văn hóa *, D: Mã trình độ văn hóa *, E: Trình độ đào tạo cao nhất *, F: Mã trình độ đào tạo cao nhất *, G: Ngành nghề đào tạo bậc cao nhất *, H: Mã ngành nghề đào tạo bậc cao nhất *, I: Năm tốt nghiệp *, J: Trình độ ĐT liên quan CNQS đang làm, K: Mã trình độ ĐT liên quan CNQS đang làm, L: Ngành nghề ĐT liên quan CNQS đang làm, M: Mã ngành nghề ĐT liên quan CNQS đang làm, N: Loại *, O: Mã Loại *, P: Tháng năm bắt đầu *, Q: Tháng năm kết thúc * , R: Bậc đào tạo *, S: Mã bậc đào tạo *, T: Tên trường *, U: Mã trường *
+
+=== Sheet: 3.Thông tin nhân thân ===
+Row 1: A: THÔNG TIN THÂN NHÂN (* Là trường thông tin bắt buộc phải nhập)
+Row 2: A: STT, B: Mã định danh quân nhân *, C: Mối quan hệ *, D: Mã mối quan hệ *, E: Họ và tên *, F: Năm sinh, G: Trạng thái *, H: Mã trạng thái *, I: Nghề nghiệp, J: Tỉnh/TP
+(Nơi ở hiện tại), K: Xã/Phường/TT
+(Nơi ở hiện tại), L: Mã nơi ở hiện tại, M: Nơi ở chi tiết, N: Trạng thái dữ liệu cấp 2
+
+=== Sheet: 4.Thông tin ĐGXL HTNV ===
+Row 1: A: THÔNG TIN ĐÁNH GIÁ XẾP LOẠI HOÀN THÀNH NHIỆM VỤ (* Là trường thông tin bắt buộc phải nhập)
+Row 2: A: STT, B: Mã định danh quân nhân *, C: Năm *, D: Đánh giá xếp loại hoàn thành nhiệm vụ *, E: Mã đánh giá xếp loại hoàn thành nhiệm vụ *
+
+=== Sheet: 5.Thông tin khen thưởng ===
+Row 1: A: THÔNG TIN KHEN THƯỞNG (* Là trường thông tin bắt buộc phải nhập)
+Row 2: A: STT, B: Mã định danh quân nhân *, C: Ngày tháng năm *, D: Đánh giá xếp loại hoàn thành nhiệm vụ *, E: Mã đánh giá xếp loại hoàn thành nhiệm vụ *, F: Lý do
+
+=== Sheet: 6.Thông tin kỷ luật ===
+Row 1: A: THÔNG TIN KỶ LUẬT (* Là trường thông tin bắt buộc phải nhập)
+Row 2: A: STT, B: Mã định danh quân nhân *, C: Ngày tháng năm *, D: Đánh giá xếp loại hoàn thành nhiệm vụ *, E: Mã đánh giá xếp loại hoàn thành nhiệm vụ *, F: Lý do
+
+=== Sheet: 7.Thông tin nhận dạng ===
+Row 1: A: THÔNG TIN NHẬN DẠNG (* Là trường thông tin bắt buộc phải nhập), J: THÔNG TIN NHẬN DẠNG (* Là trường thông tin bắt buộc phải nhập)
+Row 2: A: STT, B: Mã định danh quân nhân *, C: Cao (m) *, D: Sống mũi_tên, E: Sống mũi_mã, F: Nếp tai dưới, G: Nếp tai dưới_mã, H: Dái tai, I: Dái tai_mã, J: Dấu vết riêng, K: Hạn dùng, L: Loại cấp thẻ *, M: Mã Loại cấp thẻ *, N: Ngày cấp *, O: Hạn dùng *, P: Ghi chú
+
+=== Sheet: 8.Thông tin lương ===
+Row 1: A: THÔNG TIN LƯƠNG (* Là trường thông tin bắt buộc phải nhập)
+Row 2: A: STT, B: Mã định danh quân nhân *, C: Tháng năm bắt đầu tham gia đóng BHXH *, D: Số sổ BHXH, E: Chế độ, F: Chế độ_mã, G: Từ tháng năm *, H: Đến tháng năm, I: Đơn vị công tác *, J: Mã đơn vị công tác *, K: Loại thay đổi *, L: Mã Loại thay đổi *, M: Diện quản lý *, N: Mã Diện quản lý *, O: Diện bố trí *, P: Mã diện bố trí *, Q: Chức vụ, (CNQS) đang làm *, R: Mã Chức vụ, (CNQS) đang làm *, S: Tháng năm đảm nhận CNQS *, T: Có tính thâm niên? *, U: Có tính hưởng trợ cấp? *, V: Loại (ngạch) *, W: Mã Loại (ngạch) *, X: Nhóm *, Y: Mã nhóm *, Z: Mã nhóm, AA: Bậc *, AB: Mã bậc *, AC: PC thâm niên VK (%), AD: Hệ số bảo lưu, AE: Phụ cấp chức vụ, AF: Phụ cấp thâm niên nghề, AG: Tháng năm bắt đầu nhận lương *, AH: Hệ số quy đổi, AI: Hệ số quy đổi_mã, AJ: Có tính đóng BHXH, AK: Đơn vị công tác (Chi tiết)
+
+=== Sheet: 9.Thông tin tăng giảm ===
+Row 1: A: THÔNG TIN TĂNG GIẢM (* Là trường thông tin bắt buộc phải nhập)
+Row 2: A: STT, B: Mã định danh quân nhân *, C: Tăng/giảm *, D: Mã tăng/giảm *, E: Nhóm *
+(Tăng/Giảm), F: Mã nhóm *, G: Loại tăng/giảm *, H: Mã loại tăng/giảm *, I: Tháng năm bắt đầu *, J: Tháng năm kết thúc, K: Từ đơn vị *, L: Từ đơn vị_mã *, M: Đến đơn vị, N: Đến đơn vị_mã, O: Số quyết định, P: Lý do, Q: Tháng năm thay đổi cấp phát tài chính, R: Tháng năm thay đổi hậu cần đảm bảo, S: Ghi chú
+
+=== Sheet: 12.Thông tin sức khỏe ===
+Row 1: A: THÔNG TIN SỨC KHOẺ (* Là trường thông tin bắt buộc phải nhập), E: Từ cột D đến cột N: Thông tin bị thương / hy sinh / từ trần / mất tin, mất tích
+Row 2: A: STT, B: Mã định danh quân nhân *, C: Loại sức khỏe hiện tại *, D: Loại sức khỏe hiện tại_mã *, E: Loại *, F: Loại_mã *, G: Hoàn cảnh *, H: Mã hoàn cảnh *, I: Tháng năm bắt đầu *, J: Tháng năm kết thúc *, K: Tỉnh *
+(Tại nơi), L: Xã Phường *
+(Tại nơi), M: Mã địa điểm *, N: Có cắt quân số, O: Ghi chú, P: Hưởng theo chế độ, Q: Hưởng theo chế độ_mã, R: Nơi bị thương, S: Trạng thái dữ liệu cấp 2
+
+=== Sheet: 13.Thông tin mắc bệnh ===
+Row 1: A: Thông tin mắc bệnh hiểm nghèo / Bệnh chữa trị dài ngày
+Row 2: A: STT, B: Mã định danh quân nhân *, C: Loại bệnh *, D: Mã loại bệnh *, E: Tên bệnh *, F: Mã bệnh *, G: Tháng năm mắc *, H: Tháng năm khỏi bệnh, I: Đơn vị *, J: Nơi chữa bệnh_Mã *, K: Số quyết định, L: Dị hình, M: Dị dạng, N: Ghi chú
+
+=== Sheet: DuLieuThamChieu ===
+Row 1: A: Dân tộc, B: Mã dân tộc, D: Tôn giáo, E: Mã tôn giáo, G: Quốc tịch, H: Mã quốc tịch, M: Tỉnh Thành, N: Mã Tỉnh thành, P: Quận huyện, Q: Mã quận huyện, R: Mã tỉnh thành, T: Xã phường, U: Mã xã phường, V: Mã quận huyện, X: Symbol, Y: Tên đơn vị , Z: Mã đơn vị , AA: Đơn vị cha, AC: Giới tính, AD: Mã Giới tính, AF: Diện quản lý *, AG: Mã diện quản lý *, AI: Nhóm máu, AJ: Mã nhóm máu, AL: Diện bố trí, AM: Mã diện bố trí, AP: Cấp bậc, AQ: Mã cấp bậc, AR: Mã diện bố trí, AT: Chức vụ, (CNQS) đang làm *, AU: Mã Chức vụ, (CNQS) đang làm *, AW: Loại (ngạch), AX: Mã Loại (ngạch), AZ: Nhóm, BA: Mã nhóm, BB: Loại ngạch, BC: Mã diện bố trí, BE: Bậc, BF: Mã bậc, BG: Mã nhóm, BI: Hệ số quy đổi , BJ: Mã hệ số quy đổi, BL: Tăng/giảm, BM: Mã tăng/giảm, BO: Loại tăng/giảm, BP: Mã loại tăng/giảm , BQ: Nhóm, BS: Lý do vắng mặt cuối tháng, BT: Mã, BV: Loại sức khỏe hiện tại_tên *, BW: Loại sức khỏe hiện tại_mã *, BY: Loại_tên, BZ: Loại_mã *, CB: Hưởng theo chế độ_tên, CC: Hưởng theo chế độ_mã, CE: Loại Tên Bệnh, CF: Mã Loại tên bệnh, CH: Tên bệnh, CI: Mã bệnh, CJ: Mã loại , CL: Sống mũi_tên, CM: Sống mũi_mã, CO: Nếp tai dưới_tên, CP: Nếp tai dưới_mã, CR: Dái tai_tên, CS: Dái tai_mã, CU: Loại cấp thẻ *, CV: Mã Loại cấp thẻ, CX: Chế độ_tên, CY: Chế độ_mã, DA: Đánh giá xếp loại hoàn thành nhiệm vụ *, DB: Mã đánh giá xếp loại hoàn thành nhiệm vụ *, DD: Giải khen thưởng, DE: Mã giải khen thưởng, DG: Tên kỉ luật , DH: Mã kỉ luật, DM: Tình trạng hôn nhân *, DN: Mã tình trạng hôn nhân , DP: Khối quân, DQ: Mã khối quân, DS: Trình độ văn hóa, DT: Mã trình độ văn hóa, DV: Trình độ đào tạo cao nhất, DW: Mã trình độ đào tạo cao nhất, DY: Ngành nghề đào tạo bậc cao nhất, DZ: Mã ngành nghề đào tạo bậc cao nhất, EB: Loại thay đổi *, EC: Mã Loại thay đổi *, EE: Tên trường, EF: Mã trường, EH: Mối quan hệ *, EI: Mã mối quan hệ *, EK: Trạng thái *, EL: Mã trạng thái *, EQ: Nhóm tăng giảm
+Row 2: A: ethnic_name, B: ethnic_code, D: religion_name, E: religion_code, G: nationality_name, H: nationality_code, J: TRAINING_TYPE_CODE, K: TRAINING_TYPE_NAME, M: place_name, N: place_code, P: place_name, Q: place_code, R: place_code_parent, T: place_name, U: place_code, V: place_code_parent, X: unit_symbol, Y: unit_name, Z: identifier_code, AA: identifier_code_parent, AC: gender_name, AD: gender_code, AF: management_category_name, AG: management_category_code, AI: blood_type_name, AJ: blood_type_code, AL: deployment_category_name, AM: deployment_category_code, AN: management_category_code, AP: military_rank_name, AQ: military_rank_code, AR: deployment_category_code, AT: position_name, AU: position_code, AW: technical_expertise_name, AX: technical_expertise_code, AZ: Salary_Grade_Group_name, BA: Salary_Grade_Group_code, BB: technical_expertise_code, BC: deployment_category_code, BE: payroll_name, BF: payroll_code, BG: salary_grade_group_code, BI: conversion_coefficient_name, BJ: conversion_coefficient_code, BL: INSCREASE_DESCREASE_TYPE, BO: variation_type_name, BP: variation_type_code, BQ: variation_type_group, BS: Absence_Month_Reason_Name, BT: Absence_Month_Reason_Code, BV: health_type_name, BW: health_type_code, BY: casualty_type_name, BZ: casualty_type_code, CB: benefit_scheme_name, CC: benefit_scheme_code, CE: disease_type_name, CF: disease_type_code, CH: disease_name, CI: disease_code, CJ: disease_type_code, CL: nose_bridge_name, CM: nose_bridge_code, CO: earlobe_crease_name, CP: earlobe_crease_code, CR: earlobe_name, CS: earlobe_code, CU: issue_type_name, CV: issue_type_code, CX: insurance_type_name, CY: insurance_type_code, DA: task_assessment_name, DB: task_assessment_code, DD: reward_assessment_name, DE: reward_assessment_code, DG: reward_discipline_name, DH: reward_discipline_code, DM: marital_status_name, DN: marital_status_code, DP: category_name, DQ: category_code, DS: cultural_level_name, DT: cultural_level_code, DV: training_level_name, DW: training_level_code, DY: training_industry_name, DZ: training_industry_code, EB: salary_change_type_name, EC: salary_change_type_code, EE: military_school_name, EF: military_school_code, EH: family_relationships_name, EI: family_relationships_code, EK: PERSON_STATUS_NAME, EL: PERSON_STATUS_CODE, EN: casualty_circumstance, EO: casualty_circumstance_code, EQ: variation_type_group, ER: variation_type_group_code, ES: Ma tang giam
+
+=== Sheet: DataSelect ===
