@@ -249,6 +249,12 @@ export default function ProfileDetail() {
       if (!cloned.noi_dang_ky_kcb) cloned.noi_dang_ky_kcb = 'BVQY103';
     }
 
+    if (activeTab === 'thong_tin_chung') {
+      if (cloned.ngay_chinh_thuc && !cloned.so_the_dang && profile?.so_cccd) {
+        cloned.so_the_dang = profile.so_cccd;
+      }
+    }
+
     setInlineFormData(cloned);
     setInlineEditing(true);
   };
@@ -275,14 +281,6 @@ export default function ProfileDetail() {
           const currentCccd = next.so_cccd || profile?.so_cccd;
           if (currentCccd) {
             next.so_the_dang = currentCccd;
-          }
-        }
-      }
-      if (key === 'so_cccd' && value && value.trim() !== '') {
-        if (!next.so_the_dang) {
-          const currentNgay = next.ngay_chinh_thuc || profile?.ngay_chinh_thuc;
-          if (currentNgay && currentNgay.trim() !== '') {
-            next.so_the_dang = value;
           }
         }
       }
