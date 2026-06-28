@@ -1156,9 +1156,11 @@ export default function ProfileDetail() {
           </div>
           <div className="profile-titlegroup">
             <h1 style={{ marginBottom: '0.25rem', fontSize: '1.5rem' }}>{profile.ho_va_ten_khai_sinh || 'Chưa cập nhật tên'}</h1>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-              Mã định danh: <strong>{profile.ma_dinh_danh}</strong> | Cấp bậc: <strong>{profile.cap_bac || 'N/A'}</strong> | Chức vụ: <strong>{profile.chuc_vu || 'N/A'}</strong>
-            </p>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <div>Mã định danh: <strong style={{ color: 'var(--text-main)' }}>{profile.ma_dinh_danh}</strong></div>
+              <div>Cấp bậc: <strong style={{ color: 'var(--text-main)' }}>{profile.cap_bac || 'N/A'}</strong></div>
+              <div>Chức vụ: <strong style={{ color: 'var(--text-main)' }}>{profile.chuc_vu || 'N/A'}</strong></div>
+            </div>
           </div>
         </div>
         <div className="subnav-buttons profile-subnav" aria-label="Mục hồ sơ nhân sự">
