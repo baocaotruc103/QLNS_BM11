@@ -25,6 +25,8 @@ export default function DataTable({ title, columns, data, formatLabel, onAdd, on
 
   const formatDateVal = (col: string, val: any) => {
     if (val === null || val === undefined || val === '') return val;
+    if (React.isValidElement(val)) return val;
+    if (typeof val !== 'string' && typeof val !== 'number') return val;
     if (isFullDateField(col) && /^\d{4}-\d{2}-\d{2}/.test(String(val))) {
       const match = String(val).match(/^(\d{4})-(\d{2})-(\d{2})/);
       if (match) return `${match[3]}/${match[2]}/${match[1]}`;
@@ -85,8 +87,8 @@ export default function DataTable({ title, columns, data, formatLabel, onAdd, on
                         const rawVal = row[col];
                         const val = formatDateVal(col, rawVal);
                         return (
-                          <td key={i} data-label={formatLabel(col)} style={{ whiteSpace: 'nowrap' }}>
-                            {val !== null && val !== undefined && val !== '' ? String(val) : <span style={{ color: 'var(--text-muted)' }}>-</span>}
+                          <td key={i} data-label={formatLabel(col)} style={{ whiteSpace: React.isValidElement(val) ? 'normal' : 'nowrap' }}>
+                            {val !== null && val !== undefined && val !== '' ? val : <span style={{ color: 'var(--text-muted)' }}>-</span>}
                           </td>
                         );
                       })}

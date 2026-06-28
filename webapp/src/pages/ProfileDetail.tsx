@@ -40,6 +40,16 @@ const formatDateValue = (value: any) => {
   }
   return text;
 };
+
+const formatFullDate = (value: any) => {
+  if (!value) return '-';
+  const text = String(value);
+  if (/^\d{4}-\d{2}-\d{2}/.test(text)) {
+    const match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) return `${match[3]}/${match[2]}/${match[1]}`;
+  }
+  return text;
+};
 const INLINE_FORM_TABLES = [PARENT_TABLE, 'thong_tin_chung', 'nhan_dang'];
 
 const renderLabel = (label: string) => {
@@ -937,18 +947,38 @@ export default function ProfileDetail() {
     } else if (activeTab === 'danh_gia_nhiem_vu') {
       tableTitle = '';
     } else if (activeTab === 'bhyt_than_nhan') {
-      displayColumns = [
-        'stt', 'ho_ten', 'moi_quan_he', 'ngay_thang_nam_sinh', 
-        'gioi_tinh', 'dan_toc', 'ma_so_bhxh', 'so_cccd_noi_cap', 'noi_dang_ky_kcb', 
-        'so_dien_thoai', 'que_quan_full', 'thuong_tru_full', 'ghi_chu'
-      ];
+      displayColumns = ['stt', 'thong_tin_co_ban', 'thong_tin_the', 'dinh_danh_dia_chi', 'ghi_chu'];
       displayData = tabData.map((row, idx) => ({
         ...row,
         stt: idx + 1,
-        que_quan_full: [row.que_quan_xa, row.que_quan_tinh].filter(Boolean).join(', '),
-        thuong_tru_full: [row.thuong_tru_xa, row.thuong_tru_tinh].filter(Boolean).join(', '),
-        so_cccd_noi_cap: [row.so_cccd, row.noi_cap_cccd].filter(Boolean).join('\n')
+        thong_tin_co_ban: (
+          <div style={{ lineHeight: '1.6', minWidth: '220px' }}>
+            <div style={{ fontWeight: 600, color: 'var(--primary)' }}>{row.ho_ten || '-'} <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>({row.moi_quan_he || '-'})</span></div>
+            <div style={{ fontSize: '0.9em' }}>{formatFullDate(row.ngay_thang_nam_sinh)} | {row.gioi_tinh || '-'} | {row.dan_toc || '-'}</div>
+            {row.so_dien_thoai && <div style={{ fontSize: '0.9em' }}>SĐT: {row.so_dien_thoai}</div>}
+          </div>
+        ),
+        thong_tin_the: (
+          <div style={{ lineHeight: '1.6', minWidth: '220px' }}>
+            <div><span style={{ color: 'var(--text-muted)' }}>Mã BHXH:</span> {row.ma_so_bhxh || '-'}</div>
+            <div><span style={{ color: 'var(--text-muted)' }}>Nơi ĐK KCB:</span> {row.noi_dang_ky_kcb || '-'}</div>
+            <div style={{ fontSize: '0.9em' }}><span style={{ color: 'var(--text-muted)' }}>Hạn SD:</span> {formatFullDate(row.ngay_han_sd_bhyt_tu)} đến {formatFullDate(row.ngay_han_sd_bhyt_den)}</div>
+          </div>
+        ),
+        dinh_danh_dia_chi: (
+          <div style={{ lineHeight: '1.6', minWidth: '280px' }}>
+            <div><span style={{ color: 'var(--text-muted)' }}>CCCD:</span> {row.so_cccd || '-'} <span style={{ fontSize: '0.85em', color: 'var(--text-muted)' }}>({row.noi_cap_cccd || '-'})</span></div>
+            <div style={{ fontSize: '0.9em' }}><span style={{ color: 'var(--text-muted)' }}>Quê quán:</span> {[row.que_quan_xa, row.que_quan_tinh].filter(Boolean).join(', ') || '-'}</div>
+            <div style={{ fontSize: '0.9em' }}><span style={{ color: 'var(--text-muted)' }}>Thường trú:</span> {[row.thuong_tru_xa, row.thuong_tru_tinh].filter(Boolean).join(', ') || '-'}</div>
+          </div>
+        ),
       }));
+      finalFormatLabel = (key: string) => {
+        if (key === 'thong_tin_co_ban') return 'Thông tin cơ bản';
+        if (key === 'thong_tin_the') return 'Thẻ BHYT & KCB';
+        if (key === 'dinh_danh_dia_chi') return 'Định danh & Địa chỉ';
+        return formatFieldLabel(key);
+      };
     }
 
     return (
