@@ -7,9 +7,10 @@ export const EXPORT_TABLES = ['thong_tin_quan_nhan', 'thong_tin_chung', 'bhyt_th
 export const getHeadersForTable = (tableName: string) => {
   const tableConfig = TABLES.find(t => t.id === tableName);
   if (!tableConfig) return [];
-  return tableConfig.columns.map(col => ({
+  const columns = ['id', ...tableConfig.columns.filter(c => c !== 'id')];
+  return columns.map(col => ({
     key: col,
-    label: formatFieldLabel(col)
+    label: col === 'id' ? 'ID (Không sửa)' : formatFieldLabel(col)
   }));
 };
 

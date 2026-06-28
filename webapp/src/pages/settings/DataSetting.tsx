@@ -46,19 +46,27 @@ export default function DataSetting() {
          
          for (const record of records) {
             if (!record.ma_dinh_danh) continue; 
-            const { data, error } = await supabase.from(importTable).update(record).eq('ma_dinh_danh', record.ma_dinh_danh).select();
             
-            if (error) {
-              console.error(`Lỗi cập nhật mã ${record.ma_dinh_danh}:`, error);
-            } else if (!data || data.length === 0) {
-              const { error: insErr } = await supabase.from(importTable).insert([record]);
-              if (insErr) {
-                console.error(`Lỗi thêm mới mã ${record.ma_dinh_danh}:`, insErr);
-              } else {
-                successCount++;
-              }
+            if (record.id) {
+               // Update bằng ID nếu có
+               const { error } = await supabase.from(importTable).update(record).eq('id', record.id);
+               if (error) console.error(`Lỗi cập nhật ID ${record.id}:`, error);
+               else successCount++;
             } else {
-              successCount++;
+               // Không có ID, kiểm tra xem có an toàn để update không
+               const { data } = await supabase.from(importTable).select('id').eq('ma_dinh_danh', record.ma_dinh_danh);
+               
+               if (data && data.length === 1) {
+                  // Chỉ có 1 bản ghi (bảng 1-1), an toàn để update
+                  const { error } = await supabase.from(importTable).update(record).eq('id', data[0].id);
+                  if (error) console.error(`Lỗi cập nhật mã ${record.ma_dinh_danh}:`, error);
+                  else successCount++;
+               } else {
+                  // Chưa có bản ghi nào hoặc có nhiều bản ghi (bảng 1-n) -> Bắt buộc thêm mới để không ghi đè mất dữ liệu
+                  const { error: insErr } = await supabase.from(importTable).insert([record]);
+                  if (insErr) console.error(`Lỗi thêm mới mã ${record.ma_dinh_danh}:`, insErr);
+                  else successCount++;
+               }
             }
          }
          alert(`Đã nhập liệu thành công ${successCount}/${records.length} bản ghi vào bảng ${getTableLabel(importTable)}.`);
