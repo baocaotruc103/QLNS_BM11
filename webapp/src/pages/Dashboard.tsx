@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, Download, Upload } from 'lucide-react';
 import { PARENT_TABLE, formatFieldLabel, getTableConfig } from '../lib/tableConfig';
 import RecordModal from '../components/RecordModal';
+import { exportToExcelTemplate, parseExcelFile, EXPORT_TABLES } from '../lib/excelUtils';
 const mapLegacyProfile = (item: any) => ({
   ma_dinh_danh: item.ma_dinh_danh,
   ho_va_ten_khai_sinh: item.ho_ten_thuong_dung,
@@ -30,6 +31,7 @@ export default function Dashboard() {
   const [unitFilter, setUnitFilter] = useState('Tất cả');
   const [usingLegacyData, setUsingLegacyData] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [isProcessingExcel, setIsProcessingExcel] = useState(false);
 
   const parentConfig = getTableConfig(PARENT_TABLE);
   const parentColumns = parentConfig ? parentConfig.columns.filter(c => !['id', 'created_at', 'updated_at'].includes(c)) : [];
@@ -112,6 +114,68 @@ export default function Dashboard() {
   const qncnCount = filteredData.filter(p => p.cap_bac && p.cap_bac.includes('CN')).length;
   const hsqbsCount = filteredData.filter(p => p.cap_bac && (p.cap_bac.includes('Binh') || p.cap_bac.includes('Hạ sĩ') || p.cap_bac.includes('Trung sĩ') || p.cap_bac.includes('Thượng sĩ') || p.cap_bac.includes('LĐHĐ'))).length;
 
+  const handleExportExcel = async () => {
+    try {
+      setIsProcessingExcel(true);
+      const dataByTable: Record<string, any[]> = {};
+      for (const table of EXPORT_TABLES) {
+        const { data: tableData } = await supabase.from(table).select('*');
+        dataByTable[table] = tableData || [];
+      }
+      exportToExcelTemplate(dataByTable);
+    } catch (err: any) {
+      alert('Lỗi xuất Excel: ' + err.message);
+    } finally {
+      setIsProcessingExcel(false);
+    }
+  };
+
+  const handleImportExcel = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsProcessingExcel(true);
+      const dataByTable = await parseExcelFile(file);
+
+      // Thao tác upsert từng bảng.
+      const tablesOrder = [PARENT_TABLE, 'thong_tin_chung', 'bhyt_than_nhan'];
+      for (const table of tablesOrder) {
+        if (dataByTable[table] && dataByTable[table].length > 0) {
+           const records = dataByTable[table];
+           if (table === PARENT_TABLE) {
+              const { error } = await supabase.from(table).upsert(records, { onConflict: 'ma_dinh_danh' });
+              if (error) throw error;
+           } else {
+              // Với bảng khác, lặp qua từng record update, nếu 0 thì insert
+              for (const record of records) {
+                 if (!record.ma_dinh_danh) continue; // Phải có mã định danh để liên kết
+                 const { data, error } = await supabase.from(table).update(record).eq('ma_dinh_danh', record.ma_dinh_danh).select();
+                 if (error) throw error;
+                 if (!data || data.length === 0) {
+                    const { error: insErr } = await supabase.from(table).insert([record]);
+                    if (insErr) throw insErr;
+                 }
+              }
+           }
+        }
+      }
+      
+      alert('Nhập dữ liệu thành công!');
+      fetchData();
+    } catch (err: any) {
+      alert('Lỗi nhập Excel: ' + err.message);
+    } finally {
+      setIsProcessingExcel(false);
+      e.target.value = ''; // reset input
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowAddModal(false);
+    fetchData(); // Tải lại danh sách sau khi sửa/thêm
+  };
+
   return (
     <div className="animate-fade-in">
       <div className="page-header">
@@ -136,10 +200,30 @@ export default function Dashboard() {
             <option value="A27">A27</option>
           </select>
           {!isDashboard && (
-            <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-              <Plus size={18} />
-              Thêm mới hồ sơ
-            </button>
+            <>
+              <button 
+                className="btn btn-outline" 
+                onClick={handleExportExcel}
+                disabled={isProcessingExcel}
+                title="Tải mẫu và Xuất dữ liệu"
+              >
+                <Download size={18} />
+              </button>
+              <label className="btn btn-outline" style={{ margin: 0, cursor: 'pointer' }} title="Nhập dữ liệu từ Excel">
+                <Upload size={18} />
+                <input 
+                  type="file" 
+                  accept=".xlsx, .xls" 
+                  style={{ display: 'none' }} 
+                  onChange={handleImportExcel}
+                  disabled={isProcessingExcel}
+                />
+              </label>
+              <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+                <Plus size={18} />
+                Thêm mới hồ sơ
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -238,7 +322,7 @@ export default function Dashboard() {
           tableName={PARENT_TABLE}
           columns={parentColumns}
           formatLabel={formatFieldLabel}
-          onClose={() => setShowAddModal(false)}
+          onClose={handleCloseModal}
           onRefresh={() => {
             setShowAddModal(false);
             fetchData();
