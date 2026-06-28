@@ -581,6 +581,19 @@ tr:last-child td {
     display: none !important;
   }
 
+  /* Dashboard personnel list on mobile */
+  .dashboard-table.responsive-data-container td[data-label="Cấp bậc"],
+  .dashboard-table.responsive-data-container td[data-label="Đơn vị"],
+  .dashboard-table.responsive-data-container td[data-label="Về khoa công tác"],
+  .dashboard-table.responsive-data-container td[data-label="Ngày vào Đảng"] {
+    display: none !important;
+  }
+
+  .dashboard-table.responsive-data-container td[data-label="Họ tên khai sinh"]:before,
+  .dashboard-table.responsive-data-container td[data-label="Chức vụ"]:before {
+    display: none !important;
+  }
+
   /* Actions column on mobile */
   .responsive-data-container td.actions-col {
     padding: 0.5rem !important;

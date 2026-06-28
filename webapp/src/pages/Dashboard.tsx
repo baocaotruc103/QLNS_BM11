@@ -28,7 +28,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [unitFilter, setUnitFilter] = useState('Tất cả');
-  const [usingLegacyData, setUsingLegacyData] = useState(false);
+
   const [showAddModal, setShowAddModal] = useState(false);
 
   const parentConfig = getTableConfig(PARENT_TABLE);
@@ -66,7 +66,7 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     setLoading(true);
-    setUsingLegacyData(false);
+
 
     const { data: result, error } = await supabase
       .from(PARENT_TABLE)
@@ -93,7 +93,7 @@ export default function Dashboard() {
       setLoading(false);
     } else {
       if (error) console.error('Error fetching parent personnel data:', error);
-      setUsingLegacyData(true);
+
       await fetchLegacyData();
     }
 
@@ -130,9 +130,6 @@ export default function Dashboard() {
           <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>
             {isDashboard ? 'Thống kê tổng quan' : (isDangVien ? 'Danh sách đảng viên' : 'Danh sách nhân sự')}
           </h2>
-          <p style={{ color: 'var(--text-muted)' }}>
-            {usingLegacyData ? 'Đang hiển thị dữ liệu từ bảng thông tin chung. Cần chạy SQL đồng bộ để chuyển sang bảng cha mới.' : (isDashboard ? 'Tổng hợp số liệu nhân sự' : (isDangVien ? 'Danh sách đảng viên từ bảng thông tin nhân sự' : 'Danh sách hồ sơ từ bảng thông tin nhân sự'))}
-          </p>
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <select 
@@ -204,7 +201,7 @@ export default function Dashboard() {
             <div className="spinner"></div>
           </div>
         ) : (
-          <div className="table-container responsive-data-container">
+          <div className="table-container responsive-data-container dashboard-table">
             <table className="data-table">
               <thead>
                 <tr>
