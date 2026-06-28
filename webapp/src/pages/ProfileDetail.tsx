@@ -437,8 +437,26 @@ export default function ProfileDetail() {
       return (
         <select {...commonProps}>
           <option value="">Chọn diện quản lý...</option>
-          <option value="Quân lực quản lý">Quân lực quản lý</option>
-          <option value="Cán bộ quản lý">Cán bộ quản lý</option>
+          <option value="Sĩ quan">Sĩ quan</option>
+          <option value="Quân nhân chuyên nghiệp">Quân nhân chuyên nghiệp (QNCN)</option>
+          <option value="Công nhân quốc phòng">Công nhân quốc phòng (CNQP)</option>
+          <option value="Viên chức quốc phòng">Viên chức quốc phòng (VCQP)</option>
+          <option value="Hạ sĩ quan, Binh sĩ">Hạ sĩ quan, Binh sĩ</option>
+        </select>
+      );
+    }
+
+    if (key === 'che_do_luong') {
+      return (
+        <select {...commonProps}>
+          <option value="">Chọn chế độ...</option>
+          <option value="Tuyển dụng LĐHĐ">Tuyển dụng LĐHĐ</option>
+          <option value="Tuyển dụng QNCN">Tuyển dụng QNCN</option>
+          <option value="Tuyển chọn QNCN">Tuyển chọn QNCN</option>
+          <option value="HSQ-BS sang QNCN">HSQ-BS sang QNCN</option>
+          <option value="VCQP sang QNCN">VCQP sang QNCN</option>
+          <option value="VCQP sang Sỹ quan">VCQP sang Sỹ quan</option>
+          <option value="Tuyển chọn VCQP">Tuyển chọn VCQP</option>
         </select>
       );
     }
