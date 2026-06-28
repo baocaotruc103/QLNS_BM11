@@ -55,7 +55,17 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
   const [formData, setFormData] = useState<any>({});
   const [saving, setSaving] = useState(false);
   const [extracting, setExtracting] = useState(false);
+  const [luongRules, setLuongRules] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (tableName === 'luong') {
+      fetch('/data/luong_quan_ham_rules.json')
+        .then(res => res.json())
+        .then(data => setLuongRules(data))
+        .catch(console.error);
+    }
+  }, [tableName]);
 
   useEffect(() => {
     if (mode === 'edit' || mode === 'view') {
@@ -85,6 +95,50 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
   const handleChange = (col: string, val: string) => {
     setFormData((prev: any) => {
       const next = { ...prev, [col]: val };
+
+      // Tự động điền Hệ số và Quân hàm cho bảng lương
+      if (tableName === 'luong' && luongRules) {
+        const dienQuanLy = next.dien_quan_ly;
+        
+        // Xử lý cho Sĩ quan
+        if (dienQuanLy === 'Sĩ quan' && col === 'cap_bac') {
+          const rule = luongRules.he_so_luong?.find((r: any) => 
+            r.doi_tuong_luong === 'Sĩ quan' && r.cap_bac_hien_tai === next.cap_bac
+          );
+          if (rule) {
+            next.he_so_quy_doi = rule.he_so_luong;
+          }
+        } 
+        // Xử lý cho Quân nhân chuyên nghiệp
+        else if ((dienQuanLy === 'Quân nhân chuyên nghiệp' || dienQuanLy === 'QNCN') && ['loai_ngach', 'nhom', 'bac', 'dien_quan_ly'].includes(col)) {
+          if (next.loai_ngach && next.nhom && next.bac) {
+            const nhomStr = next.nhom.includes('Nhóm') ? next.nhom : `Nhóm ${next.nhom}`;
+            const bacNum = parseInt(next.bac);
+            
+            const rule = luongRules.he_so_luong?.find((r: any) => 
+              r.doi_tuong_luong === 'Quân nhân chuyên nghiệp' &&
+              r.loai_ngach === next.loai_ngach &&
+              r.nhom_luong === nhomStr &&
+              r.bac_luong === bacNum
+            );
+            
+            if (rule && rule.he_so_luong) {
+              next.he_so_quy_doi = rule.he_so_luong;
+              
+              // Tự động suy ra quân hàm từ hệ số
+              const qhRule = luongRules.quan_ham_theo_he_so?.find((r: any) => 
+                (r.doi_tuong_luong === 'Quân nhân chuyên nghiệp' || r.doi_tuong_luong === 'Quân nhân chuyên nghiệp (theo hệ số)') &&
+                rule.he_so_luong >= r.he_so_tu &&
+                (r.he_so_den_duoi === null || rule.he_so_luong < r.he_so_den_duoi)
+              );
+              if (qhRule) {
+                next.cap_bac = qhRule.cap_bac_hien_tai;
+              }
+            }
+          }
+        }
+      }
+
       if (col === 'so_the_bhyt' && val && val.length >= 10) {
         next.so_so_bhyt = val.slice(-10);
       }
