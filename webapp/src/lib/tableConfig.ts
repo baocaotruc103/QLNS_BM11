@@ -54,7 +54,7 @@ export const TABLES = [
     id: 'thong_tin_nhan_than',
     label: 'Gia đình',
     icon: Users,
-    columns: ['ma_dinh_danh', 'moi_quan_he', 'ho_ten', 'nam_sinh', 'nghe_nghiep', 'trang_thai', 'tinh_tp', 'xa_phuong', 'dia_chi_chi_tiet'],
+    columns: ['ma_dinh_danh', 'moi_quan_he', 'ho_ten', 'nam_sinh', 'nghe_nghiep', 'trang_thai', 'tinh_tp', 'xa_phuong', 'noi_o_chi_tiet'],
   },
   {
     id: 'khen_thuong',
@@ -179,7 +179,7 @@ export const formatFieldLabel = (key: string) => {
     nam_sinh: 'Năm sinh',
     nghe_nghiep: 'Nghề nghiệp',
     noi_o_hien_nay: 'Nơi ở hiện nay',
-    dia_chi_chi_tiet: 'Địa chỉ chi tiết',
+    noi_o_chi_tiet: 'Địa chỉ chi tiết',
     
     // Thuong tru / Tam tru / Hien tai
     thuong_tru_tinh: 'Tỉnh/Thành (nơi thường trú)',

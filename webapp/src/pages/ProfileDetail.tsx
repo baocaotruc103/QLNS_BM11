@@ -636,7 +636,7 @@ export default function ProfileDetail() {
             }
           }
 
-          const isAddress = key.includes('_tinh') || key.includes('_xa') || key.includes('_chi_tiet') || key === 'tinh_tp' || key === 'xa_phuong' || key === 'dia_chi_chi_tiet';
+          const isAddress = key.includes('_tinh') || key.includes('_xa') || key.includes('_chi_tiet') || key === 'tinh_tp' || key === 'xa_phuong' || key === 'noi_o_chi_tiet';
 
           return (
             <div className={`form-group ${isAddress ? 'address-field' : ''}`} key={key} style={{ marginBottom: 0 }}>
@@ -932,7 +932,7 @@ export default function ProfileDetail() {
         return formatFieldLabel(key);
       };
     } else if (activeTab === 'thong_tin_nhan_than') {
-      displayColumns = ['moi_quan_he', 'ho_ten', 'nam_sinh', 'nghe_nghiep', 'trang_thai', 'dia_ban', 'dia_chi_chi_tiet'];
+      displayColumns = ['moi_quan_he', 'ho_ten', 'nam_sinh', 'nghe_nghiep', 'trang_thai', 'dia_ban', 'noi_o_chi_tiet'];
       displayData = tabData.map(row => ({
         ...row,
         dia_ban: [row.xa_phuong, row.tinh_tp].filter(Boolean).join(' - '),

@@ -191,7 +191,7 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
         <div className="grid-responsive-4">
           {columns.map(col => {
             if (col === 'id' || col === 'created_at' || col === 'ma_dinh_danh') return null;
-            const isAddress = col.includes('_tinh') || col.includes('_xa') || col.includes('_chi_tiet') || col === 'tinh_tp' || col === 'xa_phuong' || col === 'dia_chi_chi_tiet';
+            const isAddress = col.includes('_tinh') || col.includes('_xa') || col.includes('_chi_tiet') || col === 'tinh_tp' || col === 'xa_phuong' || col === 'noi_o_chi_tiet';
             return (
               <div className={`form-group ${isAddress ? 'address-field' : ''}`} key={col} style={{ marginBottom: 0 }}>
                 <label className="form-label">{renderLabel(formatLabel(col))}</label>
