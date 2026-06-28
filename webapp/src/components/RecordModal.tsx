@@ -59,8 +59,8 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (tableName === 'luong') {
-      fetch('/data/luong_quan_ham_rules.json')
+    if (tableName === 'luong' || tableName === 'qua_trinh_luong') {
+      fetch('/data/quy_tac_luong.json')
         .then(res => res.json())
         .then(data => setLuongRules(data))
         .catch(console.error);
@@ -155,53 +155,81 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
       const next = { ...prev, [col]: val };
 
       // Tự động điền Hệ số và Quân hàm cho bảng lương
-      if (tableName === 'luong' && luongRules) {
+      if ((tableName === 'luong' || tableName === 'qua_trinh_luong') && luongRules?.salary_tables) {
         const dienQuanLy = next.dien_quan_ly;
         
-        // Xử lý cho Sĩ quan
-        if (dienQuanLy === 'Sĩ quan' && col === 'cap_bac') {
-          const rule = luongRules.he_so_luong?.find((r: any) => 
-            r.doi_tuong_luong === 'Sĩ quan' && r.cap_bac_hien_tai === next.cap_bac
-          );
-          if (rule) {
-            next.he_so_quy_doi = rule.he_so_luong;
-          }
-        } 
-        // Xử lý cho Quân nhân chuyên nghiệp
-        else if ((dienQuanLy === 'Quân nhân chuyên nghiệp' || dienQuanLy === 'QNCN' || dienQuanLy === 'Quân nhân chuyên nghiệp (QNCN)') && ['loai_ngach', 'nhom', 'bac', 'dien_quan_ly'].includes(col)) {
-          if (next.loai_ngach && next.nhom && next.bac) {
-            let normalizedNgach = next.loai_ngach.trim();
-            if (/cao cấp/i.test(normalizedNgach)) normalizedNgach = 'QNCN cao cấp';
-            else if (/trung cấp/i.test(normalizedNgach)) normalizedNgach = 'QNCN trung cấp';
-            else if (/sơ cấp/i.test(normalizedNgach)) normalizedNgach = 'QNCN sơ cấp';
+        const mapDienQuanLy = (d: string) => {
+            if (!d) return null;
+            if (d.includes('Sĩ quan')) return 'SQ';
+            if (d.includes('Quân nhân chuyên nghiệp') || d === 'QNCN') return 'QNCN';
+            if (d.includes('Công nhân quốc phòng')) return 'CNQP';
+            if (d.includes('Viên chức quốc phòng')) return 'VCQP';
+            if (d === 'Viên chức') return 'VC';
+            if (d.includes('Lao động hợp đồng') || d.includes('LĐHĐ')) return 'LDHD';
+            if (d.includes('Hạ sĩ quan, Binh sĩ')) return 'HSQBS';
+            return null;
+        };
 
-            const nhomMatch = String(next.nhom).match(/\d+/);
-            const nhomStr = nhomMatch ? `Nhóm ${nhomMatch[0]}` : next.nhom;
-
+        const subjectType = mapDienQuanLy(dienQuanLy);
+        if (subjectType && (next.loai_ngach || next.nhom || next.cap_bac) && next.bac) {
             const bacMatch = String(next.bac).match(/\d+/);
-            const bacNum = bacMatch ? parseInt(bacMatch[0]) : 0;
+            const bacNum = bacMatch ? parseInt(bacMatch[0]) : 1;
             
-            const rule = luongRules.he_so_luong?.find((r: any) => 
-              r.doi_tuong_luong === 'Quân nhân chuyên nghiệp' &&
-              r.loai_ngach === normalizedNgach &&
-              r.nhom_luong === nhomStr &&
-              r.bac_luong === bacNum
-            );
+            let foundTable: any = null;
             
-            if (rule && rule.he_so_luong) {
-              next.he_so_quy_doi = rule.he_so_luong;
-              
-              // Tự động suy ra quân hàm từ hệ số
-              const qhRule = luongRules.quan_ham_theo_he_so?.find((r: any) => 
-                (r.doi_tuong_luong === 'Quân nhân chuyên nghiệp' || r.doi_tuong_luong === 'Quân nhân chuyên nghiệp (theo hệ số)') &&
-                rule.he_so_luong >= r.he_so_tu &&
-                (r.he_so_den_duoi === null || rule.he_so_luong < r.he_so_den_duoi)
-              );
-              if (qhRule) {
-                next.cap_bac = qhRule.cap_bac_hien_tai;
-              }
+            for (const key in luongRules.salary_tables) {
+                const table = luongRules.salary_tables[key];
+                if (table.subject_type === subjectType) {
+                    let tableClass = (table.salary_class || '').toLowerCase();
+                    let tableGroup = (table.salary_group || '').toLowerCase();
+                    
+                    let inputClass = (next.loai_ngach || '').toLowerCase().trim();
+                    if (inputClass.includes('cao cấp')) inputClass = 'cao cấp';
+                    else if (inputClass.includes('trung cấp')) inputClass = 'trung cấp';
+                    else if (inputClass.includes('sơ cấp')) inputClass = 'sơ cấp';
+                    else if (inputClass.includes('a3')) inputClass = 'a3';
+                    else if (inputClass.includes('a2')) inputClass = 'a2';
+                    else if (inputClass.includes('a1')) inputClass = 'a1';
+                    else if (inputClass.includes('a0')) inputClass = 'a0';
+                    else if (inputClass.includes('b')) inputClass = 'loại b';
+                    else if (inputClass.includes('c')) inputClass = 'loại c';
+                    
+                    let inputGroup = (next.nhom || '').toLowerCase().trim();
+                    if (subjectType !== 'SQ') {
+                        const match = inputGroup.match(/\d+/);
+                        if (match) inputGroup = 'nhóm ' + match[0];
+                    } else {
+                        inputGroup = (next.cap_bac || next.nhom || '').toLowerCase().trim();
+                    }
+                    
+                    const classMatch = !tableClass || !inputClass || tableClass.includes(inputClass);
+                    const groupMatch = !tableGroup || !inputGroup || tableGroup.includes(inputGroup) || inputGroup.includes(tableGroup);
+                    
+                    if (classMatch && groupMatch) {
+                        foundTable = table;
+                        break;
+                    }
+                }
             }
-          }
+            
+            if (foundTable && foundTable.coefficients && foundTable.coefficients[bacNum]) {
+                next.he_so_quy_doi = foundTable.coefficients[bacNum];
+                
+                if (subjectType === 'SQ' && foundTable.salary_group) {
+                    next.cap_bac = foundTable.salary_group;
+                } else if (subjectType === 'QNCN') {
+                    // Cấp bậc cứng cho QNCN dựa trên hệ số
+                    const hs = parseFloat(next.he_so_quy_doi);
+                    if (hs < 3.95) next.cap_bac = 'Thiếu úy QNCN';
+                    else if (hs < 4.45) next.cap_bac = 'Trung úy QNCN';
+                    else if (hs < 4.90) next.cap_bac = 'Thượng úy QNCN';
+                    else if (hs < 5.30) next.cap_bac = 'Đại úy QNCN';
+                    else if (hs < 6.10) next.cap_bac = 'Thiếu tá QNCN';
+                    else if (hs < 6.80) next.cap_bac = 'Trung tá QNCN';
+                    else if (hs < 7.50) next.cap_bac = 'Thượng tá QNCN';
+                    else next.cap_bac = 'Đại tá QNCN';
+                }
+            }
         }
       }
 
