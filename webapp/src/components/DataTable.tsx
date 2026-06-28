@@ -94,20 +94,23 @@ export default function DataTable({ title, columns, data, formatLabel, onAdd, on
                       })}
                       {hasActions && (
                         <td data-label="Thao tác" className="actions-col" style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                          <div style={{ display: 'flex', gap: '0.25rem', justifyContent: 'flex-end' }}>
+                          <div className="actions-wrapper" style={{ display: 'flex', gap: '0.25rem', justifyContent: 'flex-end' }}>
                             {onView && (
                               <button className={`btn btn-icon ${isInlineActive && actionState === 'view' ? 'btn-primary' : 'btn-outline'}`} style={{ padding: '0.25rem', border: 'none' }} onClick={(e) => { e.stopPropagation(); onView(row); }} title="Xem">
                                 <Eye size={18} />
+                                <span className="action-text-mobile">Xem</span>
                               </button>
                             )}
                             {onEdit && (
                               <button className={`btn btn-icon ${isInlineActive && actionState === 'edit' ? 'btn-primary' : 'btn-outline'}`} style={{ padding: '0.25rem', border: 'none', color: isInlineActive && actionState === 'edit' ? '#fff' : 'var(--primary)' }} onClick={(e) => { e.stopPropagation(); onEdit(row); }} title="Sửa">
                                 <Edit size={18} />
+                                <span className="action-text-mobile">Sửa</span>
                               </button>
                             )}
                             {onDelete && (
                               <button className="btn btn-icon btn-outline" style={{ padding: '0.25rem', border: 'none', color: 'var(--danger)' }} onClick={(e) => { e.stopPropagation(); onDelete(row); }} title="Xóa">
                                 <Trash2 size={18} />
+                                <span className="action-text-mobile">Xóa</span>
                               </button>
                             )}
                           </div>
