@@ -21,7 +21,7 @@ export default function Login({ onLogin }: LoginProps) {
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .eq('ten_dang_nhap', username)
+        .ilike('ten_dang_nhap', username)
         .eq('mat_khau', password)
         .maybeSingle();
 
