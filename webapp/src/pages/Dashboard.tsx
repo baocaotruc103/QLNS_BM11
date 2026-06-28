@@ -109,9 +109,9 @@ export default function Dashboard() {
            (person.ma_dinh_danh?.toLowerCase() || '').includes(searchTerm.toLowerCase());
   });
 
-  const officerCount = filteredData.filter(p => p.cap_bac && (p.cap_bac.includes('Úy') || p.cap_bac.includes('Tá') || p.cap_bac.includes('Tướng')) && !p.cap_bac.includes('CN')).length;
-  const qncnCount = filteredData.filter(p => p.cap_bac && p.cap_bac.includes('CN')).length;
-  const hsqbsCount = filteredData.filter(p => p.cap_bac && (p.cap_bac.includes('Binh') || p.cap_bac.includes('Hạ sĩ') || p.cap_bac.includes('Trung sĩ') || p.cap_bac.includes('Thượng sĩ') || p.cap_bac.includes('LĐHĐ'))).length;
+  const officerCount = filteredData.filter(p => p.chuc_vu && (p.chuc_vu.includes('Bác sỹ') || p.chuc_vu.includes('Học viên BSNY') || p.chuc_vu.includes('Bác sĩ'))).length;
+  const qncnCount = filteredData.filter(p => p.chuc_vu && (p.chuc_vu.includes('Điều dưỡng viên') || p.chuc_vu.includes('Điều dưỡng trưởng')) && p.cap_bac !== 'LĐHĐ').length;
+  const ldhdCount = filteredData.filter(p => p.cap_bac === 'LĐHĐ').length;
 
   const handleExportExcel = async () => {
     try {
@@ -239,8 +239,8 @@ export default function Dashboard() {
           <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-main)' }}>{qncnCount}</div>
         </div>
         <div className="glass-panel" style={{ padding: '1.5rem', borderLeft: '4px solid #6366f1' }}>
-          <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.25rem', fontWeight: 600 }}>HSQ - BS</div>
-          <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-main)' }}>{hsqbsCount}</div>
+          <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.25rem', fontWeight: 600 }}>LĐHĐ</div>
+          <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-main)' }}>{ldhdCount}</div>
         </div>
       </div>
       )}
