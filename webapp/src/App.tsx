@@ -7,6 +7,7 @@ import UsersSetting from './pages/settings/UsersSetting';
 import DisplaySetting from './pages/settings/DisplaySetting';
 import PermissionsSetting from './pages/settings/PermissionsSetting';
 import PositionsSetting from './pages/settings/PositionsSetting';
+import DataSetting from './pages/settings/DataSetting';
 import Login from './pages/Login';
 import { MENU_CONFIG_TABLE, MENU_CONFIG_UPDATED_EVENT, MENU_ITEMS } from './lib/menuConfig';
 import { supabase } from './lib/supabaseClient';
@@ -245,6 +246,7 @@ function App() {
               <Route path="/settings/display" element={<DisplaySetting />} />
               <Route path="/settings/permissions" element={<PermissionsSetting />} />
               <Route path="/settings/positions" element={<PositionsSetting />} />
+              <Route path="/settings/data" element={<DataSetting />} />
             </Routes>
           </div>
         </main>

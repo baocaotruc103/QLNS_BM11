@@ -1,0 +1,1545 @@
+{
+  "metadata": {
+    "name": "Quy tắc nhập và tự động điền quá trình lương QNCN, VCQP, CNQP, viên chức, sĩ quan",
+    "version": "1.2.0-bo-sung-si-quan",
+    "language": "vi",
+    "date_format": "MM/YYYY",
+    "generated_at": "2026-06-28",
+    "merged_from_user_files": [
+      "quy_tac_luong_qncn_vcqp_cnqp.json",
+      "8de374ee-838e-4aba-abc3-116282bbfdc6.js",
+      "luong_quan_ham_rules_v3_vien_chuc.json",
+      "Nghị định 204/2004/NĐ-CP - Bảng 6 sĩ quan"
+    ],
+    "notes": [
+      "Mỗi thay đổi về diện đối tượng, loại/ngạch, nhóm, bậc, hệ số hoặc phụ cấp phải tạo một bản ghi quá trình mới.",
+      "Không sửa đè bản ghi cũ, trừ trường hợp sửa sai dữ liệu.",
+      "QNCN cao cấp nhóm 1 và nhóm 2 có 12 bậc; QNCN trung cấp và sơ cấp có 10 bậc.",
+      "Đã bổ sung bảng hệ số viên chức từ 01/10/2004 theo NĐ 204/2004 - Bảng 3.",
+      "Giai đoạn trước 01/10/2004 theo NĐ 25/CP nên chỉ ghi mốc lịch sử, chưa tự động hồi cứu hệ số nếu chưa đối chiếu phụ lục gốc.",
+      "Đã bổ sung bảng lương cấp bậc quân hàm sĩ quan quân đội nhân dân theo NĐ 204/2004 - Bảng 6.",
+      "Đối với sĩ quan, salary_group là cấp bậc quân hàm; salary_grade = 1 là hệ số cấp bậc hiện tại; salary_grade = 2/3 là nâng lương lần 1/lần 2 nếu cấp bậc có quy định.",
+      "Tự động dự kiến thăng quân hàm sĩ quan chỉ là gợi ý theo thời hạn tối thiểu; thực tế còn phụ thuộc tiêu chuẩn, chức vụ, trần quân hàm, nhu cầu biên chế và quyết định có thẩm quyền."
+    ]
+  },
+  "defaults": {
+    "management_area": "Quân lực quản lý",
+    "social_insurance": true,
+    "allowance_entitlement": false,
+    "position_allowance": 0,
+    "conversion_coefficient": null,
+    "preservation_coefficient": 0,
+    "salary_base_amount": null
+  },
+  "fields": {
+    "effective_month": {
+      "label": "Tháng năm hiệu lực",
+      "type": "month",
+      "required": true,
+      "format": "MM/YYYY"
+    },
+    "subject_type": {
+      "label": "Diện đối tượng",
+      "type": "select",
+      "required": true,
+      "options": [
+        {
+          "code": "HSQBS",
+          "label": "Hạ sĩ quan/Binh sĩ"
+        },
+        {
+          "code": "SQ",
+          "label": "Sĩ quan"
+        },
+        {
+          "code": "QNCN",
+          "label": "Quân nhân chuyên nghiệp"
+        },
+        {
+          "code": "CNQP",
+          "label": "Công nhân quốc phòng"
+        },
+        {
+          "code": "VCQP",
+          "label": "Viên chức quốc phòng"
+        },
+        {
+          "code": "VC",
+          "label": "Viên chức"
+        },
+        {
+          "code": "LDHD",
+          "label": "Lao động hợp đồng"
+        }
+      ]
+    },
+    "salary_class": {
+      "label": "Loại/ngạch lương",
+      "type": "dependent_select",
+      "required": true,
+      "depends_on": "subject_type",
+      "options_by_subject_type": {
+        "QNCN": [
+          "QNCN cao cấp",
+          "QNCN trung cấp",
+          "QNCN sơ cấp"
+        ],
+        "VC": [
+          "Viên chức loại A3",
+          "Viên chức loại A2",
+          "Viên chức loại A1",
+          "Viên chức loại A0",
+          "Viên chức loại B",
+          "Viên chức loại C"
+        ],
+        "VCQP": [
+          "Viên chức quốc phòng loại A3",
+          "Viên chức quốc phòng loại A2",
+          "Viên chức quốc phòng loại A1",
+          "Viên chức quốc phòng loại A0",
+          "Viên chức quốc phòng loại B",
+          "Viên chức quốc phòng loại C"
+        ],
+        "SQ": [
+          "Sĩ quan cấp tướng",
+          "Sĩ quan cấp tá",
+          "Sĩ quan cấp úy"
+        ]
+      }
+    },
+    "salary_group": {
+      "label": "Nhóm lương",
+      "type": "dependent_select_or_null",
+      "required_when_class_has_group": true,
+      "depends_on": "salary_class",
+      "options_by_salary_class": {
+        "QNCN cao cấp": [
+          {
+            "code": "QNCN_CC_N2",
+            "label": "Cao cấp nhóm 2"
+          },
+          {
+            "code": "QNCN_CC_N1",
+            "label": "Cao cấp nhóm 1"
+          }
+        ],
+        "QNCN trung cấp": [
+          {
+            "code": "QNCN_TC",
+            "label": "Trung cấp"
+          }
+        ],
+        "QNCN sơ cấp": [
+          {
+            "code": "QNCN_SC",
+            "label": "Sơ cấp"
+          }
+        ],
+        "Viên chức loại A3": [
+          {
+            "code": "VC_A3_N1",
+            "label": "Nhóm 1"
+          },
+          {
+            "code": "VC_A3_N2",
+            "label": "Nhóm 2"
+          }
+        ],
+        "Viên chức loại A2": [
+          {
+            "code": "VC_A2_N1",
+            "label": "Nhóm 1"
+          },
+          {
+            "code": "VC_A2_N2",
+            "label": "Nhóm 2"
+          }
+        ],
+        "Viên chức loại A1": [
+          {
+            "code": "VC_A1",
+            "label": "Không phân nhóm"
+          }
+        ],
+        "Viên chức loại A0": [
+          {
+            "code": "VC_A0",
+            "label": "Không phân nhóm"
+          }
+        ],
+        "Viên chức loại B": [
+          {
+            "code": "VC_B",
+            "label": "Không phân nhóm"
+          }
+        ],
+        "Viên chức loại C": [
+          {
+            "code": "VC_C_N1",
+            "label": "Nhóm 1"
+          },
+          {
+            "code": "VC_C_N2",
+            "label": "Nhóm 2"
+          },
+          {
+            "code": "VC_C_N3",
+            "label": "Nhóm 3"
+          }
+        ],
+        "Viên chức quốc phòng loại A3": [
+          {
+            "code": "VCQP_A3_N1",
+            "label": "Nhóm 1"
+          },
+          {
+            "code": "VCQP_A3_N2",
+            "label": "Nhóm 2"
+          }
+        ],
+        "Viên chức quốc phòng loại A2": [
+          {
+            "code": "VCQP_A2_N1",
+            "label": "Nhóm 1"
+          },
+          {
+            "code": "VCQP_A2_N2",
+            "label": "Nhóm 2"
+          }
+        ],
+        "Viên chức quốc phòng loại A1": [
+          {
+            "code": "VCQP_A1",
+            "label": "Không phân nhóm"
+          }
+        ],
+        "Viên chức quốc phòng loại A0": [
+          {
+            "code": "VCQP_A0",
+            "label": "Không phân nhóm"
+          }
+        ],
+        "Viên chức quốc phòng loại B": [
+          {
+            "code": "VCQP_B",
+            "label": "Không phân nhóm"
+          }
+        ],
+        "Viên chức quốc phòng loại C": [
+          {
+            "code": "VCQP_C_N1",
+            "label": "Nhóm 1"
+          },
+          {
+            "code": "VCQP_C_N2",
+            "label": "Nhóm 2"
+          },
+          {
+            "code": "VCQP_C_N3",
+            "label": "Nhóm 3"
+          }
+        ],
+        "Sĩ quan cấp tướng": [
+          {
+            "code": "SQ_DAI_TUONG",
+            "label": "Đại tướng"
+          },
+          {
+            "code": "SQ_THUONG_TUONG",
+            "label": "Thượng tướng"
+          },
+          {
+            "code": "SQ_TRUNG_TUONG",
+            "label": "Trung tướng"
+          },
+          {
+            "code": "SQ_THIEU_TUONG",
+            "label": "Thiếu tướng"
+          }
+        ],
+        "Sĩ quan cấp tá": [
+          {
+            "code": "SQ_DAI_TA",
+            "label": "Đại tá"
+          },
+          {
+            "code": "SQ_THUONG_TA",
+            "label": "Thượng tá"
+          },
+          {
+            "code": "SQ_TRUNG_TA",
+            "label": "Trung tá"
+          },
+          {
+            "code": "SQ_THIEU_TA",
+            "label": "Thiếu tá"
+          }
+        ],
+        "Sĩ quan cấp úy": [
+          {
+            "code": "SQ_DAI_UY",
+            "label": "Đại úy"
+          },
+          {
+            "code": "SQ_THUONG_UY",
+            "label": "Thượng úy"
+          },
+          {
+            "code": "SQ_TRUNG_UY",
+            "label": "Trung úy"
+          },
+          {
+            "code": "SQ_THIEU_UY",
+            "label": "Thiếu úy"
+          }
+        ]
+      }
+    },
+    "salary_grade": {
+      "label": "Bậc",
+      "type": "dependent_select",
+      "required": true,
+      "depends_on": "salary_group",
+      "allowed_ranges": {
+        "QNCN_CC_N1": [
+          1,
+          12
+        ],
+        "QNCN_CC_N2": [
+          1,
+          12
+        ],
+        "QNCN_TC": [
+          1,
+          10
+        ],
+        "QNCN_SC": [
+          1,
+          10
+        ],
+        "VC_A3_N1": [
+          1,
+          6
+        ],
+        "VCQP_A3_N1": [
+          1,
+          6
+        ],
+        "VC_A3_N2": [
+          1,
+          6
+        ],
+        "VCQP_A3_N2": [
+          1,
+          6
+        ],
+        "VC_A2_N1": [
+          1,
+          8
+        ],
+        "VCQP_A2_N1": [
+          1,
+          8
+        ],
+        "VC_A2_N2": [
+          1,
+          8
+        ],
+        "VCQP_A2_N2": [
+          1,
+          8
+        ],
+        "VC_A1": [
+          1,
+          9
+        ],
+        "VCQP_A1": [
+          1,
+          9
+        ],
+        "VC_A0": [
+          1,
+          10
+        ],
+        "VCQP_A0": [
+          1,
+          10
+        ],
+        "VC_B": [
+          1,
+          12
+        ],
+        "VCQP_B": [
+          1,
+          12
+        ],
+        "VC_C_N1": [
+          1,
+          12
+        ],
+        "VCQP_C_N1": [
+          1,
+          12
+        ],
+        "VC_C_N2": [
+          1,
+          12
+        ],
+        "VCQP_C_N2": [
+          1,
+          12
+        ],
+        "VC_C_N3": [
+          1,
+          12
+        ],
+        "VCQP_C_N3": [
+          1,
+          12
+        ],
+        "SQ_DAI_TUONG": [
+          1,
+          1
+        ],
+        "SQ_THUONG_TUONG": [
+          1,
+          1
+        ],
+        "SQ_TRUNG_TUONG": [
+          1,
+          1
+        ],
+        "SQ_THIEU_TUONG": [
+          1,
+          1
+        ],
+        "SQ_DAI_TA": [
+          1,
+          3
+        ],
+        "SQ_THUONG_TA": [
+          1,
+          3
+        ],
+        "SQ_TRUNG_TA": [
+          1,
+          3
+        ],
+        "SQ_THIEU_TA": [
+          1,
+          3
+        ],
+        "SQ_DAI_UY": [
+          1,
+          3
+        ],
+        "SQ_THUONG_UY": [
+          1,
+          3
+        ],
+        "SQ_TRUNG_UY": [
+          1,
+          1
+        ],
+        "SQ_THIEU_UY": [
+          1,
+          1
+        ]
+      }
+    },
+    "salary_coefficient": {
+      "label": "Hệ số lương",
+      "type": "number",
+      "readonly": true,
+      "auto_fill_from": [
+        "salary_group",
+        "salary_grade"
+      ]
+    },
+    "change_type": {
+      "label": "Loại thay đổi",
+      "type": "select",
+      "required": true,
+      "options": [
+        {
+          "code": "CHANGE_SUBJECT_TYPE",
+          "label": "Chuyển diện đối tượng"
+        },
+        {
+          "code": "CHANGE_SALARY_GROUP",
+          "label": "Chuyển nhóm lương"
+        },
+        {
+          "code": "ON_TIME_SALARY_INCREASE",
+          "label": "Nâng bậc lương đúng hạn"
+        },
+        {
+          "code": "DELAYED_SALARY_INCREASE",
+          "label": "Nâng bậc lương kéo dài",
+          "warning_threshold_months": 6
+        },
+        {
+          "code": "EARLY_SALARY_INCREASE",
+          "label": "Nâng bậc lương trước niên hạn",
+          "max_early_months": 12
+        },
+        {
+          "code": "CHANGE_SALARY_CLASS",
+          "label": "Nâng loại/ngạch lương"
+        },
+        {
+          "code": "PROMOTE_OFFICER_RANK",
+          "label": "Thăng quân hàm sĩ quan"
+        },
+        {
+          "code": "OFFICER_SALARY_RAISE_1",
+          "label": "Nâng lương sĩ quan lần 1"
+        },
+        {
+          "code": "OFFICER_SALARY_RAISE_2",
+          "label": "Nâng lương sĩ quan lần 2"
+        }
+      ]
+    }
+  },
+  "salary_tables": {
+    "QNCN_CC_N1": {
+      "label": "QNCN cao cấp nhóm 1",
+      "subject_type": "QNCN",
+      "salary_class": "QNCN cao cấp",
+      "salary_group": "Nhóm 1",
+      "max_grade": 12,
+      "coefficients": {
+        "1": 3.85,
+        "2": 4.2,
+        "3": 4.55,
+        "4": 4.9,
+        "5": 5.25,
+        "6": 5.6,
+        "7": 5.95,
+        "8": 6.3,
+        "9": 6.65,
+        "10": 7.0,
+        "11": 7.35,
+        "12": 7.7
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 7"
+    },
+    "QNCN_CC_N2": {
+      "label": "QNCN cao cấp nhóm 2",
+      "subject_type": "QNCN",
+      "salary_class": "QNCN cao cấp",
+      "salary_group": "Nhóm 2",
+      "max_grade": 12,
+      "coefficients": {
+        "1": 3.65,
+        "2": 4.0,
+        "3": 4.35,
+        "4": 4.7,
+        "5": 5.05,
+        "6": 5.4,
+        "7": 5.75,
+        "8": 6.1,
+        "9": 6.45,
+        "10": 6.8,
+        "11": 7.15,
+        "12": 7.5
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 7"
+    },
+    "QNCN_TC": {
+      "label": "QNCN trung cấp",
+      "subject_type": "QNCN",
+      "salary_class": "QNCN trung cấp",
+      "salary_group": null,
+      "max_grade": 10,
+      "coefficients": {
+        "1": 3.5,
+        "2": 3.8,
+        "3": 4.1,
+        "4": 4.4,
+        "5": 4.7,
+        "6": 5.0,
+        "7": 5.3,
+        "8": 5.6,
+        "9": 5.9,
+        "10": 6.2
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 7"
+    },
+    "QNCN_SC": {
+      "label": "QNCN sơ cấp",
+      "subject_type": "QNCN",
+      "salary_class": "QNCN sơ cấp",
+      "salary_group": null,
+      "max_grade": 10,
+      "coefficients": {
+        "1": 3.2,
+        "2": 3.45,
+        "3": 3.7,
+        "4": 3.95,
+        "5": 4.2,
+        "6": 4.45,
+        "7": 4.7,
+        "8": 4.95,
+        "9": 5.2,
+        "10": 5.45
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 7"
+    },
+    "SQ_DAI_TUONG": {
+      "label": "Sĩ quan - Đại tướng",
+      "subject_type": "SQ",
+      "salary_class": "Sĩ quan cấp tướng",
+      "salary_group": "Đại tướng",
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 6",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "max_grade": 1,
+      "grade_meaning": {
+        "1": "Hệ số cấp bậc quân hàm",
+        "2": "Nâng lương lần 1",
+        "3": "Nâng lương lần 2"
+      },
+      "coefficients": {
+        "1": 10.4
+      }
+    },
+    "SQ_THUONG_TUONG": {
+      "label": "Sĩ quan - Thượng tướng",
+      "subject_type": "SQ",
+      "salary_class": "Sĩ quan cấp tướng",
+      "salary_group": "Thượng tướng",
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 6",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "max_grade": 1,
+      "grade_meaning": {
+        "1": "Hệ số cấp bậc quân hàm",
+        "2": "Nâng lương lần 1",
+        "3": "Nâng lương lần 2"
+      },
+      "coefficients": {
+        "1": 9.8
+      }
+    },
+    "SQ_TRUNG_TUONG": {
+      "label": "Sĩ quan - Trung tướng",
+      "subject_type": "SQ",
+      "salary_class": "Sĩ quan cấp tướng",
+      "salary_group": "Trung tướng",
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 6",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "max_grade": 1,
+      "grade_meaning": {
+        "1": "Hệ số cấp bậc quân hàm",
+        "2": "Nâng lương lần 1",
+        "3": "Nâng lương lần 2"
+      },
+      "coefficients": {
+        "1": 9.2
+      }
+    },
+    "SQ_THIEU_TUONG": {
+      "label": "Sĩ quan - Thiếu tướng",
+      "subject_type": "SQ",
+      "salary_class": "Sĩ quan cấp tướng",
+      "salary_group": "Thiếu tướng",
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 6",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "max_grade": 1,
+      "grade_meaning": {
+        "1": "Hệ số cấp bậc quân hàm",
+        "2": "Nâng lương lần 1",
+        "3": "Nâng lương lần 2"
+      },
+      "coefficients": {
+        "1": 8.6
+      }
+    },
+    "SQ_DAI_TA": {
+      "label": "Sĩ quan - Đại tá",
+      "subject_type": "SQ",
+      "salary_class": "Sĩ quan cấp tá",
+      "salary_group": "Đại tá",
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 6",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "max_grade": 3,
+      "grade_meaning": {
+        "1": "Hệ số cấp bậc quân hàm",
+        "2": "Nâng lương lần 1",
+        "3": "Nâng lương lần 2"
+      },
+      "coefficients": {
+        "1": 8.0,
+        "2": 8.4,
+        "3": 8.6
+      }
+    },
+    "SQ_THUONG_TA": {
+      "label": "Sĩ quan - Thượng tá",
+      "subject_type": "SQ",
+      "salary_class": "Sĩ quan cấp tá",
+      "salary_group": "Thượng tá",
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 6",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "max_grade": 3,
+      "grade_meaning": {
+        "1": "Hệ số cấp bậc quân hàm",
+        "2": "Nâng lương lần 1",
+        "3": "Nâng lương lần 2"
+      },
+      "coefficients": {
+        "1": 7.3,
+        "2": 7.7,
+        "3": 8.1
+      }
+    },
+    "SQ_TRUNG_TA": {
+      "label": "Sĩ quan - Trung tá",
+      "subject_type": "SQ",
+      "salary_class": "Sĩ quan cấp tá",
+      "salary_group": "Trung tá",
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 6",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "max_grade": 3,
+      "grade_meaning": {
+        "1": "Hệ số cấp bậc quân hàm",
+        "2": "Nâng lương lần 1",
+        "3": "Nâng lương lần 2"
+      },
+      "coefficients": {
+        "1": 6.6,
+        "2": 7.0,
+        "3": 7.4
+      }
+    },
+    "SQ_THIEU_TA": {
+      "label": "Sĩ quan - Thiếu tá",
+      "subject_type": "SQ",
+      "salary_class": "Sĩ quan cấp tá",
+      "salary_group": "Thiếu tá",
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 6",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "max_grade": 3,
+      "grade_meaning": {
+        "1": "Hệ số cấp bậc quân hàm",
+        "2": "Nâng lương lần 1",
+        "3": "Nâng lương lần 2"
+      },
+      "coefficients": {
+        "1": 6.0,
+        "2": 6.4,
+        "3": 6.8
+      }
+    },
+    "SQ_DAI_UY": {
+      "label": "Sĩ quan - Đại úy",
+      "subject_type": "SQ",
+      "salary_class": "Sĩ quan cấp úy",
+      "salary_group": "Đại úy",
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 6",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "max_grade": 3,
+      "grade_meaning": {
+        "1": "Hệ số cấp bậc quân hàm",
+        "2": "Nâng lương lần 1",
+        "3": "Nâng lương lần 2"
+      },
+      "coefficients": {
+        "1": 5.4,
+        "2": 5.8,
+        "3": 6.2
+      }
+    },
+    "SQ_THUONG_UY": {
+      "label": "Sĩ quan - Thượng úy",
+      "subject_type": "SQ",
+      "salary_class": "Sĩ quan cấp úy",
+      "salary_group": "Thượng úy",
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 6",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "max_grade": 3,
+      "grade_meaning": {
+        "1": "Hệ số cấp bậc quân hàm",
+        "2": "Nâng lương lần 1",
+        "3": "Nâng lương lần 2"
+      },
+      "coefficients": {
+        "1": 5.0,
+        "2": 5.35,
+        "3": 5.7
+      }
+    },
+    "SQ_TRUNG_UY": {
+      "label": "Sĩ quan - Trung úy",
+      "subject_type": "SQ",
+      "salary_class": "Sĩ quan cấp úy",
+      "salary_group": "Trung úy",
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 6",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "max_grade": 1,
+      "grade_meaning": {
+        "1": "Hệ số cấp bậc quân hàm",
+        "2": "Nâng lương lần 1",
+        "3": "Nâng lương lần 2"
+      },
+      "coefficients": {
+        "1": 4.6
+      }
+    },
+    "SQ_THIEU_UY": {
+      "label": "Sĩ quan - Thiếu úy",
+      "subject_type": "SQ",
+      "salary_class": "Sĩ quan cấp úy",
+      "salary_group": "Thiếu úy",
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 6",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "max_grade": 1,
+      "grade_meaning": {
+        "1": "Hệ số cấp bậc quân hàm",
+        "2": "Nâng lương lần 1",
+        "3": "Nâng lương lần 2"
+      },
+      "coefficients": {
+        "1": 4.2
+      }
+    },
+    "VC_A3_N1": {
+      "label": "Viên chức loại A3 nhóm 1",
+      "subject_type": "Viên chức",
+      "salary_class": "Viên chức loại A3",
+      "salary_group": "Nhóm 1",
+      "max_grade": 6,
+      "coefficients": {
+        "1": 6.2,
+        "2": 6.56,
+        "3": 6.92,
+        "4": 7.28,
+        "5": 7.64,
+        "6": 8.0
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx"
+    },
+    "VCQP_A3_N1": {
+      "label": "Viên chức quốc phòng loại A3 nhóm 1",
+      "subject_type": "VCQP",
+      "salary_class": "Viên chức quốc phòng loại A3",
+      "salary_group": "Nhóm 1",
+      "max_grade": 6,
+      "coefficients": {
+        "1": 6.2,
+        "2": 6.56,
+        "3": 6.92,
+        "4": 7.28,
+        "5": 7.64,
+        "6": 8.0
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3; áp dụng theo cấu hình quản lý VCQP của đơn vị",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "used_same_coefficients_as": "VC_A3_N1"
+    },
+    "VC_A3_N2": {
+      "label": "Viên chức loại A3 nhóm 2",
+      "subject_type": "Viên chức",
+      "salary_class": "Viên chức loại A3",
+      "salary_group": "Nhóm 2",
+      "max_grade": 6,
+      "coefficients": {
+        "1": 5.75,
+        "2": 6.11,
+        "3": 6.47,
+        "4": 6.83,
+        "5": 7.19,
+        "6": 7.55
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx"
+    },
+    "VCQP_A3_N2": {
+      "label": "Viên chức quốc phòng loại A3 nhóm 2",
+      "subject_type": "VCQP",
+      "salary_class": "Viên chức quốc phòng loại A3",
+      "salary_group": "Nhóm 2",
+      "max_grade": 6,
+      "coefficients": {
+        "1": 5.75,
+        "2": 6.11,
+        "3": 6.47,
+        "4": 6.83,
+        "5": 7.19,
+        "6": 7.55
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3; áp dụng theo cấu hình quản lý VCQP của đơn vị",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "used_same_coefficients_as": "VC_A3_N2"
+    },
+    "VC_A2_N1": {
+      "label": "Viên chức loại A2 nhóm 1",
+      "subject_type": "Viên chức",
+      "salary_class": "Viên chức loại A2",
+      "salary_group": "Nhóm 1",
+      "max_grade": 8,
+      "coefficients": {
+        "1": 4.4,
+        "2": 4.74,
+        "3": 5.08,
+        "4": 5.42,
+        "5": 5.76,
+        "6": 6.1,
+        "7": 6.44,
+        "8": 6.78
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx"
+    },
+    "VCQP_A2_N1": {
+      "label": "Viên chức quốc phòng loại A2 nhóm 1",
+      "subject_type": "VCQP",
+      "salary_class": "Viên chức quốc phòng loại A2",
+      "salary_group": "Nhóm 1",
+      "max_grade": 8,
+      "coefficients": {
+        "1": 4.4,
+        "2": 4.74,
+        "3": 5.08,
+        "4": 5.42,
+        "5": 5.76,
+        "6": 6.1,
+        "7": 6.44,
+        "8": 6.78
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3; áp dụng theo cấu hình quản lý VCQP của đơn vị",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "used_same_coefficients_as": "VC_A2_N1"
+    },
+    "VC_A2_N2": {
+      "label": "Viên chức loại A2 nhóm 2",
+      "subject_type": "Viên chức",
+      "salary_class": "Viên chức loại A2",
+      "salary_group": "Nhóm 2",
+      "max_grade": 8,
+      "coefficients": {
+        "1": 4.0,
+        "2": 4.34,
+        "3": 4.68,
+        "4": 5.02,
+        "5": 5.36,
+        "6": 5.7,
+        "7": 6.04,
+        "8": 6.38
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx"
+    },
+    "VCQP_A2_N2": {
+      "label": "Viên chức quốc phòng loại A2 nhóm 2",
+      "subject_type": "VCQP",
+      "salary_class": "Viên chức quốc phòng loại A2",
+      "salary_group": "Nhóm 2",
+      "max_grade": 8,
+      "coefficients": {
+        "1": 4.0,
+        "2": 4.34,
+        "3": 4.68,
+        "4": 5.02,
+        "5": 5.36,
+        "6": 5.7,
+        "7": 6.04,
+        "8": 6.38
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3; áp dụng theo cấu hình quản lý VCQP của đơn vị",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "used_same_coefficients_as": "VC_A2_N2"
+    },
+    "VC_A1": {
+      "label": "Viên chức loại A1",
+      "subject_type": "Viên chức",
+      "salary_class": "Viên chức loại A1",
+      "salary_group": null,
+      "max_grade": 9,
+      "coefficients": {
+        "1": 2.34,
+        "2": 2.67,
+        "3": 3.0,
+        "4": 3.33,
+        "5": 3.66,
+        "6": 3.99,
+        "7": 4.32,
+        "8": 4.65,
+        "9": 4.98
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx"
+    },
+    "VCQP_A1": {
+      "label": "Viên chức quốc phòng loại A1",
+      "subject_type": "VCQP",
+      "salary_class": "Viên chức quốc phòng loại A1",
+      "salary_group": null,
+      "max_grade": 9,
+      "coefficients": {
+        "1": 2.34,
+        "2": 2.67,
+        "3": 3.0,
+        "4": 3.33,
+        "5": 3.66,
+        "6": 3.99,
+        "7": 4.32,
+        "8": 4.65,
+        "9": 4.98
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3; áp dụng theo cấu hình quản lý VCQP của đơn vị",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "used_same_coefficients_as": "VC_A1"
+    },
+    "VC_A0": {
+      "label": "Viên chức loại A0",
+      "subject_type": "Viên chức",
+      "salary_class": "Viên chức loại A0",
+      "salary_group": null,
+      "max_grade": 10,
+      "coefficients": {
+        "1": 2.1,
+        "2": 2.41,
+        "3": 2.72,
+        "4": 3.03,
+        "5": 3.34,
+        "6": 3.65,
+        "7": 3.96,
+        "8": 4.27,
+        "9": 4.58,
+        "10": 4.89
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx"
+    },
+    "VCQP_A0": {
+      "label": "Viên chức quốc phòng loại A0",
+      "subject_type": "VCQP",
+      "salary_class": "Viên chức quốc phòng loại A0",
+      "salary_group": null,
+      "max_grade": 10,
+      "coefficients": {
+        "1": 2.1,
+        "2": 2.41,
+        "3": 2.72,
+        "4": 3.03,
+        "5": 3.34,
+        "6": 3.65,
+        "7": 3.96,
+        "8": 4.27,
+        "9": 4.58,
+        "10": 4.89
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3; áp dụng theo cấu hình quản lý VCQP của đơn vị",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "used_same_coefficients_as": "VC_A0"
+    },
+    "VC_B": {
+      "label": "Viên chức loại B",
+      "subject_type": "Viên chức",
+      "salary_class": "Viên chức loại B",
+      "salary_group": null,
+      "max_grade": 12,
+      "coefficients": {
+        "1": 1.86,
+        "2": 2.06,
+        "3": 2.26,
+        "4": 2.46,
+        "5": 2.66,
+        "6": 2.86,
+        "7": 3.06,
+        "8": 3.26,
+        "9": 3.46,
+        "10": 3.66,
+        "11": 3.86,
+        "12": 4.06
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx"
+    },
+    "VCQP_B": {
+      "label": "Viên chức quốc phòng loại B",
+      "subject_type": "VCQP",
+      "salary_class": "Viên chức quốc phòng loại B",
+      "salary_group": null,
+      "max_grade": 12,
+      "coefficients": {
+        "1": 1.86,
+        "2": 2.06,
+        "3": 2.26,
+        "4": 2.46,
+        "5": 2.66,
+        "6": 2.86,
+        "7": 3.06,
+        "8": 3.26,
+        "9": 3.46,
+        "10": 3.66,
+        "11": 3.86,
+        "12": 4.06
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3; áp dụng theo cấu hình quản lý VCQP của đơn vị",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "used_same_coefficients_as": "VC_B"
+    },
+    "VC_C_N1": {
+      "label": "Viên chức loại C nhóm 1",
+      "subject_type": "Viên chức",
+      "salary_class": "Viên chức loại C",
+      "salary_group": "Nhóm 1",
+      "max_grade": 12,
+      "coefficients": {
+        "1": 1.65,
+        "2": 1.83,
+        "3": 2.01,
+        "4": 2.19,
+        "5": 2.37,
+        "6": 2.55,
+        "7": 2.73,
+        "8": 2.91,
+        "9": 3.09,
+        "10": 3.27,
+        "11": 3.45,
+        "12": 3.63
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx"
+    },
+    "VCQP_C_N1": {
+      "label": "Viên chức quốc phòng loại C nhóm 1",
+      "subject_type": "VCQP",
+      "salary_class": "Viên chức quốc phòng loại C",
+      "salary_group": "Nhóm 1",
+      "max_grade": 12,
+      "coefficients": {
+        "1": 1.65,
+        "2": 1.83,
+        "3": 2.01,
+        "4": 2.19,
+        "5": 2.37,
+        "6": 2.55,
+        "7": 2.73,
+        "8": 2.91,
+        "9": 3.09,
+        "10": 3.27,
+        "11": 3.45,
+        "12": 3.63
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3; áp dụng theo cấu hình quản lý VCQP của đơn vị",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "used_same_coefficients_as": "VC_C_N1"
+    },
+    "VC_C_N2": {
+      "label": "Viên chức loại C nhóm 2",
+      "subject_type": "Viên chức",
+      "salary_class": "Viên chức loại C",
+      "salary_group": "Nhóm 2",
+      "max_grade": 12,
+      "coefficients": {
+        "1": 1.5,
+        "2": 1.68,
+        "3": 1.86,
+        "4": 2.04,
+        "5": 2.22,
+        "6": 2.4,
+        "7": 2.58,
+        "8": 2.76,
+        "9": 2.94,
+        "10": 3.12,
+        "11": 3.3,
+        "12": 3.48
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx"
+    },
+    "VCQP_C_N2": {
+      "label": "Viên chức quốc phòng loại C nhóm 2",
+      "subject_type": "VCQP",
+      "salary_class": "Viên chức quốc phòng loại C",
+      "salary_group": "Nhóm 2",
+      "max_grade": 12,
+      "coefficients": {
+        "1": 1.5,
+        "2": 1.68,
+        "3": 1.86,
+        "4": 2.04,
+        "5": 2.22,
+        "6": 2.4,
+        "7": 2.58,
+        "8": 2.76,
+        "9": 2.94,
+        "10": 3.12,
+        "11": 3.3,
+        "12": 3.48
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3; áp dụng theo cấu hình quản lý VCQP của đơn vị",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "used_same_coefficients_as": "VC_C_N2"
+    },
+    "VC_C_N3": {
+      "label": "Viên chức loại C nhóm 3",
+      "subject_type": "Viên chức",
+      "salary_class": "Viên chức loại C",
+      "salary_group": "Nhóm 3",
+      "max_grade": 12,
+      "coefficients": {
+        "1": 1.35,
+        "2": 1.53,
+        "3": 1.71,
+        "4": 1.89,
+        "5": 2.07,
+        "6": 2.25,
+        "7": 2.43,
+        "8": 2.61,
+        "9": 2.79,
+        "10": 2.97,
+        "11": 3.15,
+        "12": 3.33
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx"
+    },
+    "VCQP_C_N3": {
+      "label": "Viên chức quốc phòng loại C nhóm 3",
+      "subject_type": "VCQP",
+      "salary_class": "Viên chức quốc phòng loại C",
+      "salary_group": "Nhóm 3",
+      "max_grade": 12,
+      "coefficients": {
+        "1": 1.35,
+        "2": 1.53,
+        "3": 1.71,
+        "4": 1.89,
+        "5": 2.07,
+        "6": 2.25,
+        "7": 2.43,
+        "8": 2.61,
+        "9": 2.79,
+        "10": 2.97,
+        "11": 3.15,
+        "12": 3.33
+      },
+      "applies_from": "10/2004",
+      "legal_basis": "NĐ 204/2004 - Bảng 3; áp dụng theo cấu hình quản lý VCQP của đơn vị",
+      "source_url": "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-204-2004-ND-CP-che-do-tien-luong-doi-voi-can-bo-cong-chuc-vien-chuc-luc-luong-vu-trang-52629.aspx",
+      "used_same_coefficients_as": "VC_C_N3"
+    }
+  },
+  "salary_increase_policy": [
+    {
+      "period": {
+        "before": "07/2014"
+      },
+      "rules": [
+        {
+          "subject_type": "QNCN",
+          "months": 36
+        },
+        {
+          "subject_type_in": [
+            "VCQP",
+            "CNQP"
+          ],
+          "months": 24
+        }
+      ],
+      "source_from_user_file": true
+    },
+    {
+      "period": {
+        "from": "07/2014",
+        "to": "11/2022"
+      },
+      "rules": [
+        {
+          "subject_type": "QNCN",
+          "condition": "salary_coefficient < 4.70",
+          "months": 24
+        },
+        {
+          "subject_type": "QNCN",
+          "condition": "salary_coefficient >= 4.70",
+          "months": 36
+        }
+      ],
+      "source_from_user_file": true
+    },
+    {
+      "period": {
+        "from": "12/2022"
+      },
+      "rules": [
+        {
+          "subject_type": "QNCN",
+          "condition": "salary_coefficient < 5.40",
+          "months": 24
+        },
+        {
+          "subject_type": "QNCN",
+          "condition": "salary_coefficient >= 5.40",
+          "months": 36
+        }
+      ],
+      "source_from_user_file": true
+    },
+    {
+      "period": {
+        "from": "09/2013"
+      },
+      "rules": [
+        {
+          "subject_type_in": [
+            "VC",
+            "VCQP"
+          ],
+          "salary_group_in": [
+            "VC_A3_N1",
+            "VC_A3_N2",
+            "VC_A2_N1",
+            "VC_A2_N2",
+            "VC_A1",
+            "VC_A0",
+            "VCQP_A3_N1",
+            "VCQP_A3_N2",
+            "VCQP_A2_N1",
+            "VCQP_A2_N2",
+            "VCQP_A1",
+            "VCQP_A0"
+          ],
+          "months": 36,
+          "meaning": "Ngạch/chức danh yêu cầu trình độ cao đẳng trở lên"
+        },
+        {
+          "subject_type_in": [
+            "VC",
+            "VCQP"
+          ],
+          "salary_group_in": [
+            "VC_B",
+            "VC_C_N1",
+            "VC_C_N2",
+            "VC_C_N3",
+            "VCQP_B",
+            "VCQP_C_N1",
+            "VCQP_C_N2",
+            "VCQP_C_N3"
+          ],
+          "months": 24,
+          "meaning": "Ngạch/chức danh yêu cầu trình độ trung cấp trở xuống hoặc nhân viên phục vụ"
+        }
+      ],
+      "legal_basis": "TT 08/2013/TT-BNV; TT 03/2021/TT-BNV",
+      "source_url": [
+        "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Thong-tu-08-2013-TT-BNV-huong-dan-nang-bac-luong-can-bo-cong-vien-chuc-204743.aspx",
+        "https://vanban.chinhphu.vn/?docid=203499&pageid=27160"
+      ]
+    }
+  ],
+  "early_salary_increase_policy": {
+    "eligible_subject_types": [
+      "QNCN",
+      "VC",
+      "VCQP",
+      "CNQP"
+    ],
+    "max_early_months": 12,
+    "rate_limit_percent": 10,
+    "requires": [
+      "achievement_decision",
+      "not_at_max_grade",
+      "meets_regular_raise_standards"
+    ],
+    "legal_basis": "TT 08/2013/TT-BNV; TT 03/2021/TT-BNV"
+  },
+  "beyond_frame_policy": {
+    "eligible_only_at_max_grade": true,
+    "first_entitlement_after_months": 36,
+    "first_percent": 5,
+    "additional_month_interval": 12,
+    "additional_percent_per_interval": 1,
+    "formula": "months_at_max_grade < 36 ? 0 : 5 + floor((months_at_max_grade - 36) / 12)"
+  },
+  "base_salary_policy": [
+    {
+      "from": "07/2024",
+      "to": "06/2026",
+      "amount_vnd": 2340000,
+      "legal_basis": "NĐ 73/2024/NĐ-CP"
+    },
+    {
+      "from": "07/2026",
+      "amount_vnd": 2530000,
+      "legal_basis": "NĐ 161/2026/NĐ-CP"
+    }
+  ],
+  "calculation_rules": {
+    "get_salary_coefficient": "salary_tables[salary_group].coefficients[String(salary_grade)]",
+    "get_regular_raise_months": "Find first salary_increase_policy where effective_month in period and rule matches subject_type, salary_group, salary_coefficient.",
+    "next_grade": "salary_grade < max_grade ? salary_grade + 1 : null",
+    "next_raise_month": "add_months(salary_start_month, regular_raise_months - early_salary_months + delay_months)",
+    "salary_amount": "salary_coefficient * base_salary_amount",
+    "get_officer_rank_coefficient": "salary_tables[salary_group].coefficients[String(salary_grade || 1)] where subject_type == \"SQ\"",
+    "get_next_officer_rank_month": "Find rank_promotion_policy.rules where from_rank_code == salary_group; add months/months_min to rank_start_month; only show as expected review date.",
+    "officer_grade_meaning": "For SQ: salary_grade 1 = rank coefficient; 2 = officer salary raise lần 1; 3 = officer salary raise lần 2."
+  },
+  "programming_notes": [
+    "Trong UI, trường salary_group nên lưu code bảng lương như VC_A1, VC_A3_N1, QNCN_CC_N1 để tra hệ số nhanh.",
+    "Nếu nhập VC_A1, VC_A0, VC_B thì salary_class có nhóm không phân nhóm; vẫn lưu salary_group bằng code bảng lương.",
+    "Khi đã ở max_grade, không tính next_grade; chuyển sang beyond_frame_policy.",
+    "Các mốc trước 10/2004 cần bổ sung bảng hệ số cũ nếu webapp cần hồi cứu tự động."
+  ],
+  "rank_promotion_policy": {
+    "legal_basis": "Luật Sĩ quan QĐND Việt Nam 1999, sửa đổi 2008, 2014, 2024; Điều 17, Điều 18",
+    "source_url": [
+      "https://thuvienphapluat.vn/van-ban/Bo-may-hanh-chinh/Luat-Si-quan-Quan-doi-nhan-dan-Viet-Nam-1999-16-1999-QH10-46063.aspx",
+      "https://thuvienphapluat.vn/chinh-sach-phap-luat-moi/vn/ho-tro-phap-luat/tu-van-phap-luat/31472/thoi-han-xet-thang-cap-bac-ham-quan-doi-cong-an-nhan-dan"
+    ],
+    "subject_type": "SQ",
+    "applies_to": "Sĩ quan tại ngũ",
+    "important_note": "Chỉ dùng để gợi ý thời điểm xét thăng quân hàm. Kết quả thực tế phụ thuộc đủ tiêu chuẩn, cấp bậc hiện tại thấp hơn trần quân hàm của chức vụ/chức danh, nhu cầu biên chế và quyết định của cấp có thẩm quyền.",
+    "rules": [
+      {
+        "from_rank_code": "SQ_THIEU_UY",
+        "from_rank": "Thiếu úy",
+        "to_rank_code": "SQ_TRUNG_UY",
+        "to_rank": "Trung úy",
+        "months": 24
+      },
+      {
+        "from_rank_code": "SQ_TRUNG_UY",
+        "from_rank": "Trung úy",
+        "to_rank_code": "SQ_THUONG_UY",
+        "to_rank": "Thượng úy",
+        "months": 36
+      },
+      {
+        "from_rank_code": "SQ_THUONG_UY",
+        "from_rank": "Thượng úy",
+        "to_rank_code": "SQ_DAI_UY",
+        "to_rank": "Đại úy",
+        "months": 36
+      },
+      {
+        "from_rank_code": "SQ_DAI_UY",
+        "from_rank": "Đại úy",
+        "to_rank_code": "SQ_THIEU_TA",
+        "to_rank": "Thiếu tá",
+        "months": 48
+      },
+      {
+        "from_rank_code": "SQ_THIEU_TA",
+        "from_rank": "Thiếu tá",
+        "to_rank_code": "SQ_TRUNG_TA",
+        "to_rank": "Trung tá",
+        "months": 48
+      },
+      {
+        "from_rank_code": "SQ_TRUNG_TA",
+        "from_rank": "Trung tá",
+        "to_rank_code": "SQ_THUONG_TA",
+        "to_rank": "Thượng tá",
+        "months": 48
+      },
+      {
+        "from_rank_code": "SQ_THUONG_TA",
+        "from_rank": "Thượng tá",
+        "to_rank_code": "SQ_DAI_TA",
+        "to_rank": "Đại tá",
+        "months": 48
+      },
+      {
+        "from_rank_code": "SQ_DAI_TA",
+        "from_rank": "Đại tá",
+        "to_rank_code": "SQ_THIEU_TUONG",
+        "to_rank": "Thiếu tướng/Chuẩn Đô đốc Hải quân",
+        "months_min": 48
+      },
+      {
+        "from_rank_code": "SQ_THIEU_TUONG",
+        "from_rank": "Thiếu tướng",
+        "to_rank_code": "SQ_TRUNG_TUONG",
+        "to_rank": "Trung tướng/Phó Đô đốc Hải quân",
+        "months_min": 48
+      },
+      {
+        "from_rank_code": "SQ_TRUNG_TUONG",
+        "from_rank": "Trung tướng",
+        "to_rank_code": "SQ_THUONG_TUONG",
+        "to_rank": "Thượng tướng/Đô đốc Hải quân",
+        "months_min": 48
+      },
+      {
+        "from_rank_code": "SQ_THUONG_TUONG",
+        "from_rank": "Thượng tướng",
+        "to_rank_code": "SQ_DAI_TUONG",
+        "to_rank": "Đại tướng",
+        "months_min": 48,
+        "note": "Thực hiện theo chức vụ, tiêu chuẩn và thẩm quyền đặc biệt."
+      }
+    ],
+    "early_promotion": {
+      "allowed": true,
+      "legal_basis": "Điều 18 Luật Sĩ quan QĐND Việt Nam; Thông tư 18/2025/TT-BQP",
+      "max_early_months_general": 12,
+      "note": "Điều kiện chi tiết về thành tích, chiến công, khen thưởng, thấp hơn trần quân hàm của chức vụ/chức danh được cấu hình ở cấp nghiệp vụ nếu đơn vị cần xét nâng trước hạn."
+    }
+  },
+  "officer_salary_raise_policy": {
+    "legal_basis": "NĐ 204/2004 - Bảng 6; hướng dẫn của Bộ Quốc phòng về nâng lương sĩ quan",
+    "subject_type": "SQ",
+    "applies_to_salary_groups": [
+      "SQ_THUONG_UY",
+      "SQ_DAI_UY",
+      "SQ_THIEU_TA",
+      "SQ_TRUNG_TA",
+      "SQ_THUONG_TA",
+      "SQ_DAI_TA"
+    ],
+    "grade_meaning": {
+      "1": "Hệ số cấp bậc quân hàm",
+      "2": "Nâng lương lần 1",
+      "3": "Nâng lương lần 2"
+    },
+    "regular_months_rule_note": "Thời hạn nâng lương sĩ quan thường cần đối chiếu hướng dẫn nội bộ/BQP theo từng trường hợp chức vụ và cấp bậc; file này ưu tiên lưu hệ số nâng lương lần 1/lần 2 để webapp tra cứu. Nếu cần tự động ngày nâng lương sĩ quan, cấu hình thêm rule theo văn bản đơn vị đang áp dụng.",
+    "early_salary_raise": {
+      "allowed": true,
+      "legal_basis": "Thông tư 18/2025/TT-BQP",
+      "note": "Thông tư 18/2025/TT-BQP quy định tiêu chí, tiêu chuẩn thăng quân hàm cấp tá, cấp úy vượt bậc/trước thời hạn và nâng lương sĩ quan trước thời hạn."
+    }
+  }
+}

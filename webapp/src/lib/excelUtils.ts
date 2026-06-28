@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx';
 import { TABLES, formatFieldLabel } from './tableConfig';
 
-export const EXPORT_TABLES = ['thong_tin_quan_nhan', 'thong_tin_chung', 'bhyt_than_nhan'];
+export const EXPORT_TABLES = ['thong_tin_quan_nhan', 'thong_tin_chung', 'bhyt_than_nhan', 'thong_tin_nhan_than', 'luong'];
 
 // Translate column keys to Vietnamese labels for Excel headers
 export const getHeadersForTable = (tableName: string) => {
@@ -14,10 +14,10 @@ export const getHeadersForTable = (tableName: string) => {
 };
 
 // Create a workbook with sheets for the specified tables
-export const exportToExcelTemplate = (dataByTable: Record<string, any[]>, filename: string = 'Mau_Nhap_Lieu_Nhan_Su.xlsx') => {
+export const exportToExcelTemplate = (dataByTable: Record<string, any[]>, tablesToExport: string[] = EXPORT_TABLES, filename: string = 'Mau_Nhap_Lieu_Nhan_Su.xlsx') => {
   const wb = XLSX.utils.book_new();
 
-  EXPORT_TABLES.forEach(tableName => {
+  tablesToExport.forEach(tableName => {
     const tableConfig = TABLES.find(t => t.id === tableName);
     if (!tableConfig) return;
 
@@ -55,7 +55,7 @@ export const exportToExcelTemplate = (dataByTable: Record<string, any[]>, filena
   XLSX.writeFile(wb, filename);
 };
 
-export const parseExcelFile = async (file: File): Promise<Record<string, any[]>> => {
+export const parseExcelFile = async (file: File, tablesToImport: string[] = EXPORT_TABLES): Promise<Record<string, any[]>> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     
@@ -66,7 +66,7 @@ export const parseExcelFile = async (file: File): Promise<Record<string, any[]>>
         
         const result: Record<string, any[]> = {};
 
-        EXPORT_TABLES.forEach(tableName => {
+        tablesToImport.forEach(tableName => {
           const tableConfig = TABLES.find(t => t.id === tableName);
           if (!tableConfig) return;
 
