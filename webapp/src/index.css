@@ -876,6 +876,9 @@ tr:last-child td {
     flex-direction: column;
     align-items: stretch;
     gap: 1.25rem;
+    position: relative;
+    top: auto;
+    z-index: 1;
   }
 
   .profile-summary {
