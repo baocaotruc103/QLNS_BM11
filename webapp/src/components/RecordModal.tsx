@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Save, Camera } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
-import { PARENT_TABLE } from '../lib/tableConfig';
 import imageCompression from 'browser-image-compression';
 import LocationSelect from './LocationSelect';
 

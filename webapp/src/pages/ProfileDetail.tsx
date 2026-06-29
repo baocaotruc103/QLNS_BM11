@@ -1,10 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
-import { ArrowLeft, Edit, Plus, Save, UserCircle, X, Camera, FileText } from 'lucide-react';
+import { ArrowLeft, Edit, Plus, Save, UserCircle, X, FileText } from 'lucide-react';
 import DataTable from '../components/DataTable';
 import RecordModal from '../components/RecordModal';
-import { extractDataFromImage } from '../lib/aiService';
 import imageCompression from 'browser-image-compression';
 
 import LocationSelect from '../components/LocationSelect';
@@ -111,9 +110,6 @@ export default function ProfileDetail() {
   const [inlineFormData, setInlineFormData] = useState<any>({});
   const [showLuongSummaryModal, setShowLuongSummaryModal] = useState(false);
   
-  const [extracting, setExtracting] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
@@ -353,46 +349,6 @@ export default function ProfileDetail() {
 
       return next;
     });
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setExtracting(true);
-    try {
-      const options = {
-        maxSizeMB: 0.5,
-        maxWidthOrHeight: 800,
-        useWebWorker: true,
-      };
-      const compressedFile = await imageCompression(file, options);
-      const fileExt = compressedFile.name.split('.').pop() || 'jpg';
-      const identifier = inlineFormData.ma_dinh_danh || `temp_${Date.now()}`;
-      const fileName = `${identifier}_${Date.now()}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('Files')
-        .upload(filePath, compressedFile);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('Files')
-        .getPublicUrl(filePath);
-
-      setInlineFormData((prev: any) => ({
-        ...prev,
-        avatar_url: publicUrl
-      }));
-      alert('Tải ảnh lên thành công! Vui lòng lưu lại bản ghi.');
-    } catch (err: any) {
-      alert("Lỗi tải ảnh: " + (err.message || 'Lỗi không xác định'));
-    } finally {
-      setExtracting(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
   };
 
   const renderInlineInput = (key: string) => {
