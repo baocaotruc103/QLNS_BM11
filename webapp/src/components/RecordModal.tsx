@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Save, Camera } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { PARENT_TABLE } from '../lib/tableConfig';
+import imageCompression from 'browser-image-compression';
 import LocationSelect from './LocationSelect';
-import { extractDataFromImage } from '../lib/aiService';
 
 interface RecordModalProps {
   mode: 'view' | 'edit' | 'add';
@@ -249,13 +250,34 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
 
     setExtracting(true);
     try {
-      const extractedData = await extractDataFromImage(file);
+      const options = {
+        maxSizeMB: 0.5,
+        maxWidthOrHeight: 800,
+        useWebWorker: true,
+      };
+      const compressedFile = await imageCompression(file, options);
+      const fileExt = compressedFile.name.split('.').pop() || 'jpg';
+      const identifier = formData.ma_dinh_danh || `temp_${Date.now()}`;
+      const fileName = `${identifier}_${Date.now()}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('Files')
+        .upload(filePath, compressedFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('Files')
+        .getPublicUrl(filePath);
+
       setFormData((prev: any) => ({
         ...prev,
-        ...extractedData
+        avatar_url: publicUrl
       }));
+      alert('Tải ảnh lên thành công! Vui lòng lưu lại bản ghi.');
     } catch (err: any) {
-      alert("Lỗi trích xuất thông tin: " + (err.message || 'Lỗi không xác định'));
+      alert("Lỗi tải ảnh: " + (err.message || 'Lỗi không xác định'));
     } finally {
       setExtracting(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -310,31 +332,6 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
           <button className="btn btn-outline" style={{ padding: '0.25rem', border: 'none' }} onClick={onClose}><X size={20} /></button>
         </div>
 
-        {tableName === 'thong_tin_quan_nhan' && (['add', 'edit'].includes(mode)) && (
-          <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--bg-glass)', padding: '1rem', borderRadius: '12px' }}>
-            <input 
-              type="file" 
-              accept="image/*" 
-              capture="environment" 
-              ref={fileInputRef} 
-              style={{ display: 'none' }} 
-              onChange={handleImageUpload} 
-            />
-            <button 
-              className="btn btn-primary" 
-              onClick={() => fileInputRef.current?.click()}
-              disabled={extracting}
-            >
-              <Camera size={18} />
-              {extracting ? 'Đang trích xuất...' : 'Chụp ảnh / Tải ảnh lên'}
-            </button>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Tự động điền dữ liệu từ ảnh thẻ/hồ sơ bằng AI.
-            </div>
-            {extracting && <div className="spinner" style={{ width: '20px', height: '20px', borderBottomColor: 'transparent' }}></div>}
-          </div>
-        )}
-
         <div className="grid-responsive-4">
           {columns.map(col => {
             if (col === 'id' || col === 'created_at' || col === 'ma_dinh_danh') return null;
@@ -344,6 +341,34 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
                 <label className="form-label">{renderLabel(formatLabel(col))}</label>
                 {mode === 'view' ? (
                   <div className="form-control field-readonly">{formData[col] !== null && formData[col] !== undefined && formData[col] !== '' ? String(formData[col]) : <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Không có dữ liệu</span>}</div>
+                ) : col === 'avatar_url' ? (
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={formData[col] || ''}
+                      onChange={e => handleChange(col, e.target.value)}
+                      placeholder="Nhập link hoặc tải ảnh lên..."
+                    />
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      capture="environment" 
+                      ref={fileInputRef} 
+                      style={{ display: 'none' }} 
+                      onChange={handleImageUpload} 
+                    />
+                    <button 
+                      className="btn btn-primary" 
+                      style={{ whiteSpace: 'nowrap' }}
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={extracting}
+                      type="button"
+                    >
+                      <Camera size={18} />
+                      {extracting ? 'Đang tải...' : 'Tải ảnh đại diện'}
+                    </button>
+                  </div>
                 ) : col === 'que_quan' ? (
                   <LocationSelect
                     type="combined"

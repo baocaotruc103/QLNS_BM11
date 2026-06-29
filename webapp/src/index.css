@@ -267,6 +267,15 @@ h2 {
   z-index: 40;
 }
 
+.desktop-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+}
+
 .mobile-overlay {
   position: fixed;
   inset: 0;
@@ -431,6 +440,10 @@ tr:last-child td {
     display: flex;
   }
 
+  .desktop-header {
+    display: none;
+  }
+
   .main-content {
     padding: 0;
   }
@@ -514,24 +527,27 @@ tr:last-child td {
     border-bottom: none;
   }
 
-  .responsive-data-container tr.action-inline-row {
+  .responsive-data-container tr.inline-action-row {
     display: block;
     margin-bottom: 1rem;
     border: 1px solid var(--border);
-    border-top: none;
-    border-bottom-left-radius: var(--radius-md);
-    border-bottom-right-radius: var(--radius-md);
-    background: var(--primary-soft);
+    border-radius: var(--radius-md);
+    background: #ffffff;
+    overflow: hidden;
   }
 
-  .responsive-data-container tr.action-inline-row td {
+  .responsive-data-container tr.inline-action-row td {
     display: block;
-    padding: 1rem !important;
-    text-align: center !important;
+    padding: 0 !important;
+    text-align: left !important;
     border: none;
   }
 
-  .responsive-data-container tr.action-inline-row .btn {
+  .responsive-data-container tr.inline-action-row td:before {
+    display: none !important;
+  }
+
+  .responsive-data-container tr.inline-action-row .btn {
     flex: 1;
     justify-content: center;
   }
@@ -578,6 +594,13 @@ tr:last-child td {
   .bhyt-mobile-card .responsive-data-container td[data-label="STT"],
   .bhyt-mobile-card .responsive-data-container td[data-label="Định danh & Địa chỉ"],
   .bhyt-mobile-card .responsive-data-container td[data-label="Ghi chú"] {
+    display: none !important;
+  }
+
+  .family-mobile-card .responsive-data-container td[data-label="Nghề nghiệp"],
+  .family-mobile-card .responsive-data-container td[data-label="Trạng thái"],
+  .family-mobile-card .responsive-data-container td[data-label="Tỉnh TP, Xã phường"],
+  .family-mobile-card .responsive-data-container td[data-label="Nơi ở chi tiết"] {
     display: none !important;
   }
 
@@ -802,9 +825,9 @@ tr:last-child td {
 }
 
 .profile-avatar {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
+  width: 120px;
+  height: 160px;
+  border-radius: var(--radius-md);
   background: var(--primary-soft);
   display: flex;
   align-items: center;
@@ -820,13 +843,15 @@ tr:last-child td {
 @media (max-width: 768px) {
   .subnav-buttons,
   .profile-subnav {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
     overflow-x: visible;
-    justify-content: flex-start;
   }
 
   .subnav-button {
-    flex: 0 1 auto;
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .profile-header {
@@ -839,8 +864,8 @@ tr:last-child td {
   }
 
   .profile-avatar {
-    width: 52px;
-    height: 52px;
+    width: 100px;
+    height: 133px;
   }
 
   .profile-titlegroup h1 {
@@ -958,7 +983,83 @@ tr:last-child td {
     padding: 5rem 3rem;
     max-width: 480px;
   }
+
   .login-form {
     gap: 1.5rem;
   }
+}
+
+/* Personnel Card Styles */
+.personnel-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .personnel-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+}
+
+.personnel-card {
+  display: flex;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.personnel-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-soft);
+}
+
+.personnel-card-avatar {
+  width: 100px;
+  height: 133px;
+  border-radius: var(--radius-md);
+  background: #f0f4f8; /* Soft blue-ish gray matching the image */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a202c; /* Dark icon */
+  flex-shrink: 0;
+}
+
+.personnel-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
+}
+
+.personnel-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.personnel-detail {
+  font-size: 0.9rem;
+  color: #718096; /* Gray text */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.personnel-detail span {
+  font-weight: 700;
+  color: #1a202c; /* Dark text for values */
 }

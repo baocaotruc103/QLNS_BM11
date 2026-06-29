@@ -38,7 +38,8 @@ export const TABLES = [
       'thang_nam_bat_dau_nhan_luong',
       'thang_nam_tham_gia_bhxh',
       'so_so_bhxh',
-      'che_do_luong'
+      'che_do_luong',
+      'avatar_url'
     ],
   },
   {

@@ -104,12 +104,17 @@ function App() {
 
   const user = JSON.parse(localStorage.getItem('auth_user') || '{}');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isMobileUserMenuOpen, setIsMobileUserMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false);
+      }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setIsMobileUserMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -148,25 +153,44 @@ function App() {
 
         <main className="main-content" style={{ padding: 0 }}>
           {/* Mobile Header */}
-          <header className="mobile-header">
+          <header className="mobile-header" style={{ justifyContent: 'space-between' }}>
             <button className="btn btn-outline" style={{ border: 'none', padding: '0.5rem' }} onClick={() => setIsMobileOpen(true)}>
               <Menu size={24} />
             </button>
-            <div style={{ fontWeight: 600, color: 'var(--primary)' }}>Quản lý nhân sự</div>
-            <button className="btn btn-outline" style={{ border: 'none', padding: '0.5rem' }} onClick={handleLogout}>
-              <LogOut size={20} />
-            </button>
+            <div style={{ position: 'relative' }} ref={mobileMenuRef}>
+              <button 
+                onClick={() => setIsMobileUserMenuOpen(!isMobileUserMenuOpen)}
+                style={{ 
+                  background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: 500, color: 'var(--text-main)'
+                }}
+              >
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--primary-soft)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <User size={18} />
+                </div>
+                <span>Xin chào, {user.ho_va_ten || user.ten_dang_nhap}</span>
+              </button>
+
+              {isMobileUserMenuOpen && (
+                <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '0.5rem', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', minWidth: '200px', zIndex: 50 }}>
+                  <div style={{ padding: '0.5rem' }}>
+                    <button className="nav-item" style={{ width: '100%', background: 'transparent', textAlign: 'left', border: 'none', cursor: 'pointer', padding: '0.5rem 1rem' }} onClick={() => { alert('Chức năng Xem thông tin tài khoản đang được phát triển'); setIsMobileUserMenuOpen(false); }}>
+                      <User size={16} style={{ marginRight: '0.5rem' }} /> Xem thông tin tài khoản
+                    </button>
+                    <button className="nav-item" style={{ width: '100%', background: 'transparent', textAlign: 'left', border: 'none', cursor: 'pointer', padding: '0.5rem 1rem' }} onClick={() => { alert('Chức năng Đổi mật khẩu đang được phát triển'); setIsMobileUserMenuOpen(false); }}>
+                      <Key size={16} style={{ marginRight: '0.5rem' }} /> Đổi mật khẩu
+                    </button>
+                    <div style={{ height: '1px', background: 'var(--border)', margin: '0.5rem 0' }}></div>
+                    <button className="nav-item" style={{ width: '100%', background: 'transparent', textAlign: 'left', border: 'none', cursor: 'pointer', padding: '0.5rem 1rem', color: 'var(--danger)' }} onClick={handleLogout}>
+                      <LogOut size={16} style={{ marginRight: '0.5rem' }} /> Đăng xuất
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </header>
 
           {/* Desktop Header */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'flex-end', 
-            alignItems: 'center', 
-            padding: '1rem 2rem', 
-            background: 'var(--bg-surface)', 
-            borderBottom: '1px solid var(--border)' 
-          }}>
+          <div className="desktop-header">
             <div style={{ position: 'relative' }} ref={menuRef}>
               <button 
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}

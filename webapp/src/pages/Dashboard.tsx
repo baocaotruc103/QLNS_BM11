@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, User } from 'lucide-react';
 import { PARENT_TABLE, formatFieldLabel, getTableConfig } from '../lib/tableConfig';
 import RecordModal from '../components/RecordModal';
 const mapLegacyProfile = (item: any) => ({
@@ -27,6 +27,7 @@ export default function Dashboard() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [unitFilter, setUnitFilter] = useState('Tất cả');
 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -70,7 +71,7 @@ export default function Dashboard() {
 
     const { data: result, error } = await supabase
       .from(PARENT_TABLE)
-      .select('ma_dinh_danh, ho_va_ten_khai_sinh, don_vi, dien_bo_tri, cap_bac, chuc_vu, thang_nam_vao_quan_doi, thang_nam_ve_khoa_cong_tac')
+      .select('ma_dinh_danh, ho_va_ten_khai_sinh, don_vi, dien_bo_tri, cap_bac, chuc_vu, thang_nam_vao_quan_doi, thang_nam_ve_khoa_cong_tac, avatar_url')
       .order('ho_va_ten_khai_sinh', { ascending: true })
       .limit(100);
 
@@ -125,30 +126,52 @@ export default function Dashboard() {
 
   return (
     <div className="animate-fade-in">
-      <div className="page-header">
-        <div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+      <div className="page-header" style={{ alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>
             {isDashboard ? 'Thống kê tổng quan' : (isDangVien ? 'Danh sách đảng viên' : 'Danh sách nhân sự')}
           </h2>
+          {!isDashboard && (
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <button 
+                className="btn btn-outline" 
+                style={{ padding: '0.4rem', border: 'none', background: 'transparent', boxShadow: 'none' }}
+                onClick={() => setIsSearchOpen(!isSearchOpen)}
+                title="Tìm kiếm"
+              >
+                <Search size={22} style={{ color: isSearchOpen ? 'var(--primary)' : 'var(--text-muted)' }} />
+              </button>
+              {isSearchOpen && (
+                <input
+                  type="text"
+                  className="form-control animate-fade-in"
+                  placeholder="Nhập tên hoặc mã định danh..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{ marginLeft: '0.25rem', width: '220px', padding: '0.4rem 0.8rem', height: '36px' }}
+                  autoFocus
+                />
+              )}
+            </div>
+          )}
         </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'nowrap', marginTop: '0.75rem', width: '100%' }}>
           <select 
             className="form-control" 
             value={unitFilter}
             onChange={(e) => setUnitFilter(e.target.value)}
-            style={{ minWidth: '200px' }}
+            style={{ flex: 1, minWidth: 0 }}
           >
-            <option value="Tất cả">Tất cả các đơn vị</option>
+            <option value="Tất cả">Tất cả đơn vị</option>
             <option value="B11">B11</option>
             <option value="B16">B16</option>
             <option value="A27">A27</option>
           </select>
           {!isDashboard && (
             <>
-
-              <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+              <button className="btn btn-primary" style={{ width: 'auto', whiteSpace: 'nowrap', padding: '0.5rem 1rem' }} onClick={() => setShowAddModal(true)}>
                 <Plus size={18} />
-                Thêm mới hồ sơ
+                Thêm mới
               </button>
             </>
           )}
@@ -179,64 +202,44 @@ export default function Dashboard() {
 
       {!isDashboard && (
         <>
-      <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
-        <div className="form-group" style={{ marginBottom: 0 }}>
-          <div style={{ position: 'relative' }}>
-            <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Tìm kiếm theo tên hoặc mã định danh..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ width: '100%', paddingLeft: '2.5rem' }}
-            />
-          </div>
-        </div>
-      </div>
 
-      <div className="table-container glass-panel animate-fade-in" style={{ animationDelay: '0.1s' }}>
+      <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
         {loading ? (
-          <div style={{ padding: '3rem', display: 'flex', justifyContent: 'center' }}>
+          <div className="glass-panel" style={{ padding: '3rem', display: 'flex', justifyContent: 'center' }}>
             <div className="spinner"></div>
           </div>
         ) : (
-          <div className="table-container responsive-data-container dashboard-table">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th style={{ whiteSpace: 'nowrap' }}>Họ tên khai sinh</th>
-                  <th style={{ whiteSpace: 'nowrap' }}>Cấp bậc</th>
-                  <th style={{ whiteSpace: 'nowrap' }}>Chức vụ</th>
-                  <th style={{ whiteSpace: 'nowrap' }}>Đơn vị</th>
-                  <th style={{ whiteSpace: 'nowrap' }}>Về khoa công tác</th>
-                  {isDangVien && <th style={{ whiteSpace: 'nowrap' }}>Ngày vào Đảng</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredData.length === 0 ? (
-                  <tr>
-                    <td colSpan={isDangVien ? 6 : 5} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Không tìm thấy hồ sơ nào.</td>
-                  </tr>
-                ) : (
-                  filteredData.map((person: any) => (
-                    <tr
-                      key={person.ma_dinh_danh}
-                      className="data-row"
-                      onClick={() => navigate(`/profile/${person.ma_dinh_danh}`)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <td data-label="Họ tên khai sinh" style={{ fontWeight: 600, color: 'var(--primary)' }}>{person.ho_va_ten_khai_sinh || '-'}</td>
-                      <td data-label="Cấp bậc">{person.cap_bac || '-'}</td>
-                      <td data-label="Chức vụ">{person.chuc_vu || '-'}</td>
-                      <td data-label="Đơn vị">{person.don_vi || '-'}</td>
-                      <td data-label="Về khoa công tác">{formatDateVal(person.thang_nam_ve_khoa_cong_tac) || '-'}</td>
-                      {isDangVien && <td data-label="Ngày vào Đảng">{formatDateVal(person.ngay_vao_dang) || '-'}</td>}
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+          <div className="personnel-grid">
+            {filteredData.length === 0 ? (
+              <div className="glass-panel" style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
+                Không tìm thấy hồ sơ nào.
+              </div>
+            ) : (
+              filteredData.map((person: any) => (
+                <div 
+                  key={person.ma_dinh_danh} 
+                  className="personnel-card"
+                  onClick={() => navigate(`/profile/${person.ma_dinh_danh}`)}
+                >
+                  <div className="personnel-card-avatar" style={{ overflow: 'hidden' }}>
+                    {person.avatar_url ? (
+                      <img src={person.avatar_url} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <User size={32} />
+                    )}
+                  </div>
+                  <div className="personnel-card-info">
+                    <div className="personnel-name">{person.ho_va_ten_khai_sinh || '-'}</div>
+                    <div className="personnel-detail">MĐD: <span>{person.ma_dinh_danh}</span></div>
+                    <div className="personnel-detail">CB: <span>{person.cap_bac || 'N/A'}</span></div>
+                    <div className="personnel-detail">CV: <span>{person.chuc_vu || '-'}</span></div>
+                    {isDangVien && (
+                      <div className="personnel-detail">Ngày vào Đảng: <span>{formatDateVal(person.ngay_vao_dang) || '-'}</span></div>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         )}
       </div>

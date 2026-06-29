@@ -5,6 +5,7 @@ import { ArrowLeft, Edit, Plus, Save, UserCircle, X, Camera, FileText } from 'lu
 import DataTable from '../components/DataTable';
 import RecordModal from '../components/RecordModal';
 import { extractDataFromImage } from '../lib/aiService';
+import imageCompression from 'browser-image-compression';
 
 import LocationSelect from '../components/LocationSelect';
 import { PARENT_TABLE, TABLES, formatFieldLabel, getTableConfig } from '../lib/tableConfig';
@@ -112,6 +113,56 @@ export default function ProfileDetail() {
   
   const [extracting, setExtracting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !profile?.ma_dinh_danh) return;
+
+    try {
+      setUploadingAvatar(true);
+      
+      const options = {
+        maxSizeMB: 0.5,
+        maxWidthOrHeight: 800,
+        useWebWorker: true,
+      };
+      
+      const compressedFile = await imageCompression(file, options);
+      
+      const fileExt = compressedFile.name.split('.').pop() || 'jpg';
+      const fileName = `${profile.ma_dinh_danh}_${Date.now()}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('Files')
+        .upload(filePath, compressedFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('Files')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from(PARENT_TABLE)
+        .update({ avatar_url: publicUrl })
+        .eq('ma_dinh_danh', profile.ma_dinh_danh);
+
+      if (updateError) throw updateError;
+
+      setProfile({ ...profile, avatar_url: publicUrl });
+      alert('Tải ảnh đại diện thành công!');
+    } catch (error: any) {
+      console.error('Lỗi khi tải ảnh:', error);
+      alert('Có lỗi xảy ra khi tải ảnh: ' + error.message);
+    } finally {
+      setUploadingAvatar(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = '';
+    }
+  };
 
   useEffect(() => {
     if (id) {
@@ -310,13 +361,34 @@ export default function ProfileDetail() {
 
     setExtracting(true);
     try {
-      const extractedData = await extractDataFromImage(file);
+      const options = {
+        maxSizeMB: 0.5,
+        maxWidthOrHeight: 800,
+        useWebWorker: true,
+      };
+      const compressedFile = await imageCompression(file, options);
+      const fileExt = compressedFile.name.split('.').pop() || 'jpg';
+      const identifier = inlineFormData.ma_dinh_danh || `temp_${Date.now()}`;
+      const fileName = `${identifier}_${Date.now()}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('Files')
+        .upload(filePath, compressedFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('Files')
+        .getPublicUrl(filePath);
+
       setInlineFormData((prev: any) => ({
         ...prev,
-        ...extractedData
+        avatar_url: publicUrl
       }));
+      alert('Tải ảnh lên thành công! Vui lòng lưu lại bản ghi.');
     } catch (err: any) {
-      alert("Lỗi trích xuất thông tin: " + (err.message || 'Lỗi không xác định'));
+      alert("Lỗi tải ảnh: " + (err.message || 'Lỗi không xác định'));
     } finally {
       setExtracting(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -640,30 +712,7 @@ export default function ProfileDetail() {
 
     return (
       <>
-        {tableName === PARENT_TABLE && isCurrentlyEditing && (
-          <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--bg-glass)', padding: '1rem', borderRadius: '12px' }}>
-            <input 
-              type="file" 
-              accept="image/*" 
-              capture="environment" 
-              ref={fileInputRef} 
-              style={{ display: 'none' }} 
-              onChange={handleImageUpload} 
-            />
-            <button 
-              className="btn btn-primary" 
-              onClick={() => fileInputRef.current?.click()}
-              disabled={extracting}
-            >
-              <Camera size={18} />
-              {extracting ? 'Đang trích xuất...' : 'Chụp ảnh / Tải ảnh lên'}
-            </button>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Tự động điền dữ liệu từ ảnh thẻ/hồ sơ bằng AI.
-            </div>
-            {extracting && <div className="spinner" style={{ width: '20px', height: '20px', borderBottomColor: 'transparent' }}></div>}
-          </div>
-        )}
+
         <div className={tableName === 'bhyt_than_nhan' ? "grid-responsive-5" : "grid-responsive-4"}>
         {columns.map((key) => {
           let value = isCurrentlyEditing ? inlineFormData[key] : record?.[key];
@@ -1078,8 +1127,12 @@ export default function ProfileDetail() {
       };
     }
 
+    let containerClass = 'animate-fade-in';
+    if (activeTab === 'bhyt_than_nhan') containerClass += ' bhyt-mobile-card';
+    if (activeTab === 'thong_tin_nhan_than') containerClass += ' family-mobile-card';
+
     return (
-      <div className={`animate-fade-in ${activeTab === 'bhyt_than_nhan' ? 'bhyt-mobile-card' : ''}`}>
+      <div className={containerClass}>
         <DataTable
           title={tableTitle}
           columns={displayColumns}
@@ -1151,15 +1204,36 @@ export default function ProfileDetail() {
 
       <div className="glass-panel profile-header">
         <div className="profile-summary">
-          <div className="profile-avatar">
-            <UserCircle size={36} style={{ color: 'var(--text-main)' }} />
+          <div 
+            className="profile-avatar" 
+            style={{ position: 'relative', cursor: 'pointer', overflow: 'hidden' }}
+            onClick={() => avatarInputRef.current?.click()}
+            title="Nhấn để đổi ảnh đại diện"
+          >
+            {profile.avatar_url ? (
+              <img src={profile.avatar_url} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <UserCircle size={64} style={{ color: 'var(--text-main)' }} />
+            )}
+            {uploadingAvatar && (
+              <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="spinner" style={{ width: '20px', height: '20px', border: '2px solid #fff', borderTopColor: 'transparent' }}></div>
+              </div>
+            )}
+            <input 
+              type="file" 
+              accept="image/*" 
+              style={{ display: 'none' }} 
+              ref={avatarInputRef}
+              onChange={handleAvatarUpload}
+            />
           </div>
-          <div className="profile-titlegroup">
-            <h1 style={{ marginBottom: '0.25rem', fontSize: '1.5rem' }}>{profile.ho_va_ten_khai_sinh || 'Chưa cập nhật tên'}</h1>
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <div>Mã định danh: <strong style={{ color: 'var(--text-main)' }}>{profile.ma_dinh_danh}</strong></div>
-              <div>Cấp bậc: <strong style={{ color: 'var(--text-main)' }}>{profile.cap_bac || 'N/A'}</strong></div>
-              <div>Chức vụ: <strong style={{ color: 'var(--text-main)' }}>{profile.chuc_vu || 'N/A'}</strong></div>
+          <div className="profile-titlegroup" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0.25rem 0' }}>
+            <h1 style={{ marginBottom: '0.6rem', fontSize: '1.5rem', lineHeight: '1.2' }}>{profile.ho_va_ten_khai_sinh || 'Chưa cập nhật tên'}</h1>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.95rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              <div>MĐD: <strong style={{ color: 'var(--text-main)' }}>{profile.ma_dinh_danh}</strong></div>
+              <div>CB: <strong style={{ color: 'var(--text-main)' }}>{profile.cap_bac || 'N/A'}</strong></div>
+              <div>CV: <strong style={{ color: 'var(--text-main)' }}>{profile.chuc_vu || 'N/A'}</strong></div>
             </div>
           </div>
         </div>
