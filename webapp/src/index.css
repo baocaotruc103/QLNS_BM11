@@ -812,16 +812,34 @@ tr:last-child td {
 
 .profile-header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: stretch;
-  gap: 1rem;
+  gap: 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 30;
 }
 
 .profile-summary {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  flex: 0 0 25%;
   min-width: 0;
+}
+
+.profile-subnav {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.profile-header .subnav-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.6rem;
+  width: 100%;
 }
 
 .profile-avatar {
@@ -855,12 +873,15 @@ tr:last-child td {
   }
 
   .profile-header {
+    flex-direction: column;
     align-items: stretch;
+    gap: 1.25rem;
   }
 
   .profile-summary {
     align-items: flex-start;
     gap: 0.875rem;
+    flex: auto;
   }
 
   .profile-avatar {
