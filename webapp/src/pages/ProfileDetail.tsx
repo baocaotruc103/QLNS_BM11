@@ -990,11 +990,11 @@ export default function ProfileDetail() {
                 <Edit size={14} style={{ marginRight: '0.35rem' }} /> Sửa thông tin chung
               </button>
             </div>
-            <div className="info-grid">
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'center' }}>
               {['thang_nam_bat_dau_nhan_luong', 'thang_nam_tham_gia_bhxh', 'so_so_bhxh', 'che_do_luong'].map(col => (
-                <div className="info-item" key={col}>
-                  <div className="info-label">{formatFieldLabel(col)}</div>
-                  <div className="info-value" style={{ fontWeight: 500, color: 'var(--primary)' }}>{profile?.[col] || '-'}</div>
+                <div key={col} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1 1 auto', minWidth: '180px' }}>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{formatFieldLabel(col)}:</span>
+                  <span style={{ fontWeight: 600, color: 'var(--primary)', fontSize: '0.9rem' }}>{profile?.[col] || '-'}</span>
                 </div>
               ))}
             </div>
