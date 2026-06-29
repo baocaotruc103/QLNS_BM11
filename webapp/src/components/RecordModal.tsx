@@ -56,7 +56,24 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
   const [saving, setSaving] = useState(false);
   const [extracting, setExtracting] = useState(false);
   const [luongRules, setLuongRules] = useState<any>(null);
+  const [danhMucCapBac, setDanhMucCapBac] = useState<any[]>([]);
+  const [danhMucChucVu, setDanhMucChucVu] = useState<any[]>([]);
+  const [suggestedDienBoTri, setSuggestedDienBoTri] = useState<string[]>(['Cán bộ', 'Quân lực']);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    supabase.from('danh_muc_cap_bac').select('*').then(({ data }) => {
+      if (data) {
+        setDanhMucCapBac(data);
+        const uniqueDienBoTri = Array.from(new Set(data.map(d => d.dien_bo_tri).filter(Boolean)));
+        const merged = Array.from(new Set(['Cán bộ', 'Quân lực', ...uniqueDienBoTri]));
+        setSuggestedDienBoTri(merged as string[]);
+      }
+    });
+    supabase.from('chuc_vu').select('*').then(({ data }) => {
+      if (data) setDanhMucChucVu(data);
+    });
+  }, []);
 
   useEffect(() => {
     if (tableName === 'luong' || tableName === 'qua_trinh_luong') {
@@ -403,7 +420,49 @@ export default function RecordModal({ mode, tableName, columns, record, maDinhDa
                     <option value="VCQP sang Sỹ quan">VCQP sang Sỹ quan</option>
                     <option value="Tuyển chọn VCQP">Tuyển chọn VCQP</option>
                   </select>
-                ) : col === 'dien_quan_ly' ? (
+                  ) : col === 'dien_bo_tri' ? (
+                    <>
+                      <input
+                        list="dien-bo-tri-list"
+                        className="form-control"
+                        value={formData[col] || ''}
+                        onChange={e => handleChange(col, e.target.value)}
+                        disabled={false}
+                        placeholder="Nhập hoặc chọn diện bố trí..."
+                      />
+                      <datalist id="dien-bo-tri-list">
+                        {suggestedDienBoTri.map(opt => (
+                          <option key={opt} value={opt} />
+                        ))}
+                      </datalist>
+                    </>
+                  ) : col === 'cap_bac' ? (
+                    <select
+                      className="form-control"
+                      value={formData[col] || ''}
+                      onChange={e => handleChange(col, e.target.value)}
+                      disabled={false}
+                    >
+                      <option value="">Chọn cấp bậc...</option>
+                      {danhMucCapBac
+                        .filter(cb => !formData.dien_bo_tri || cb.dien_bo_tri === formData.dien_bo_tri)
+                        .map(cb => (
+                          <option key={cb.id} value={cb.cap_bac}>{cb.cap_bac}</option>
+                      ))}
+                    </select>
+                  ) : col === 'chuc_vu' || col === 'chuc_vu_cnqs' ? (
+                    <select
+                      className="form-control"
+                      value={formData[col] || ''}
+                      onChange={e => handleChange(col, e.target.value)}
+                      disabled={false}
+                    >
+                      <option value="">Chọn chức vụ...</option>
+                      {danhMucChucVu.map(cv => (
+                        <option key={cv.id} value={cv.ten_chuc_vu}>{cv.ten_chuc_vu}</option>
+                      ))}
+                    </select>
+                  ) : col === 'dien_quan_ly' ? (
                   <select
                     className="form-control"
                     value={formData[col] || ''}

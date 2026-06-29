@@ -27,6 +27,7 @@ export const SettingsTabs = () => {
     { id: 'display', label: 'Cấu hình hiển thị', path: '/settings/display', icon: Eye },
     { id: 'permissions', label: 'Phân quyền', path: '/settings/permissions', icon: Shield },
     { id: 'positions', label: 'Danh mục chức vụ', path: '/settings/positions', icon: Briefcase },
+    { id: 'ranks', label: 'Danh mục cấp bậc', path: '/settings/ranks', icon: Briefcase },
     { id: 'data', label: 'Dữ liệu Excel', path: '/settings/data', icon: Save },
   ];
 

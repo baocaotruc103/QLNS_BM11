@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import { LogOut, Menu, ChevronLeft, ChevronRight, User, Key } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import ProfileDetail from './pages/ProfileDetail';
@@ -7,10 +7,12 @@ import UsersSetting from './pages/settings/UsersSetting';
 import DisplaySetting from './pages/settings/DisplaySetting';
 import PermissionsSetting from './pages/settings/PermissionsSetting';
 import PositionsSetting from './pages/settings/PositionsSetting';
+import RanksSetting from './pages/settings/RanksSetting';
 import DataSetting from './pages/settings/DataSetting';
 import Login from './pages/Login';
 import { MENU_CONFIG_TABLE, MENU_CONFIG_UPDATED_EVENT, MENU_ITEMS } from './lib/menuConfig';
 import { supabase } from './lib/supabaseClient';
+import { isManager } from './lib/auth';
 import './index.css';
 
 type SidebarProps = {
@@ -65,6 +67,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, onLogout }: Sideba
 
       <nav style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
         {MENU_ITEMS.map(section => {
+          if (section.section === 'Hệ thống' && !isManager()) return null;
           const sectionItems = section.items.filter(item => visibleMenus[item.id] !== false);
           if (sectionItems.length === 0) return null;
 
@@ -266,11 +269,17 @@ function App() {
               <Route path="/profile/:id" element={<ProfileDetail />} />
 
               {/* Settings Routes */}
-              <Route path="/settings/users" element={<UsersSetting />} />
-              <Route path="/settings/display" element={<DisplaySetting />} />
-              <Route path="/settings/permissions" element={<PermissionsSetting />} />
-              <Route path="/settings/positions" element={<PositionsSetting />} />
-              <Route path="/settings/data" element={<DataSetting />} />
+              {isManager() && (
+                <>
+                  <Route path="/settings/users" element={<UsersSetting />} />
+                  <Route path="/settings/display" element={<DisplaySetting />} />
+                  <Route path="/settings/permissions" element={<PermissionsSetting />} />
+                  <Route path="/settings/positions" element={<PositionsSetting />} />
+                  <Route path="/settings/ranks" element={<RanksSetting />} />
+                  <Route path="/settings/data" element={<DataSetting />} />
+                </>
+              )}
+              <Route path="/settings/*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>
         </main>

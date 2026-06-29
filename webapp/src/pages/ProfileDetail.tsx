@@ -8,6 +8,7 @@ import imageCompression from 'browser-image-compression';
 
 import LocationSelect from '../components/LocationSelect';
 import { PARENT_TABLE, TABLES, formatFieldLabel, getTableConfig } from '../lib/tableConfig';
+import { canEditRecord } from '../lib/auth';
 
 const SYSTEM_COLUMNS = ['id', 'created_at', 'updated_at', 'stt', 'trang_thai_du_lieu_cap_2'];
 
@@ -112,6 +113,26 @@ export default function ProfileDetail() {
   
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  const [danhMucCapBac, setDanhMucCapBac] = useState<any[]>([]);
+  const [danhMucChucVu, setDanhMucChucVu] = useState<any[]>([]);
+  const [suggestedDienBoTri, setSuggestedDienBoTri] = useState<string[]>(['Cán bộ', 'Quân lực']);
+
+  const canEdit = profile ? canEditRecord(profile.ma_dinh_danh, profile.don_vi) : false;
+
+  useEffect(() => {
+    supabase.from('danh_muc_cap_bac').select('*').then(({ data }) => {
+      if (data) {
+        setDanhMucCapBac(data);
+        const uniqueDienBoTri = Array.from(new Set(data.map(d => d.dien_bo_tri).filter(Boolean)));
+        const merged = Array.from(new Set(['Cán bộ', 'Quân lực', ...uniqueDienBoTri]));
+        setSuggestedDienBoTri(merged as string[]);
+      }
+    });
+    supabase.from('chuc_vu').select('*').then(({ data }) => {
+      if (data) setDanhMucChucVu(data);
+    });
+  }, []);
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -400,6 +421,47 @@ export default function ProfileDetail() {
           <option value="Độc thân">Độc thân</option>
           <option value="Đã kết hôn">Đã kết hôn</option>
           <option value="Đã ly hôn">Đã ly hôn</option>
+        </select>
+      );
+    }
+
+    if (key === 'dien_bo_tri') {
+      return (
+        <>
+          <input
+            list="inline-dien-bo-tri-list"
+            {...commonProps}
+            placeholder="Nhập hoặc chọn diện bố trí..."
+          />
+          <datalist id="inline-dien-bo-tri-list">
+            {suggestedDienBoTri.map(opt => (
+              <option key={opt} value={opt} />
+            ))}
+          </datalist>
+        </>
+      );
+    }
+
+    if (key === 'cap_bac') {
+      return (
+        <select {...commonProps}>
+          <option value="">Chọn cấp bậc...</option>
+          {danhMucCapBac
+            .filter(cb => !inlineFormData.dien_bo_tri || cb.dien_bo_tri === inlineFormData.dien_bo_tri)
+            .map(cb => (
+              <option key={cb.id} value={cb.cap_bac}>{cb.cap_bac}</option>
+          ))}
+        </select>
+      );
+    }
+
+    if (key === 'chuc_vu' || key === 'chuc_vu_cnqs') {
+      return (
+        <select {...commonProps}>
+          <option value="">Chọn chức vụ...</option>
+          {danhMucChucVu.map(cv => (
+            <option key={cv.id} value={cv.ten_chuc_vu}>{cv.ten_chuc_vu}</option>
+          ))}
         </select>
       );
     }
@@ -703,7 +765,9 @@ export default function ProfileDetail() {
     );
   };
 
-  const renderInlineActions = (hasRecord: boolean) => (
+  const renderInlineActions = (hasRecord: boolean) => {
+    if (!canEdit && !inlineEditing) return null;
+    return (
     <div className="inline-header-actions">
       {inlineEditing ? (
         <>
@@ -721,7 +785,7 @@ export default function ProfileDetail() {
         </button>
       )}
     </div>
-  );
+  )};
 
   const handleTableAction = (action: 'view' | 'edit' | 'add' | null, record?: any) => {
     setModalState(action);
@@ -900,9 +964,9 @@ export default function ProfileDetail() {
             columns={DAO_TAO_TABLE_COLUMNS}
             data={displayData}
             formatLabel={formatFieldLabel}
-            onAdd={() => handleTableAction('add')}
-            onEdit={(row) => handleTableAction('edit', row)}
-            onDelete={(row) => handleDelete(row)}
+            onAdd={canEdit ? () => handleTableAction('add') : undefined}
+            onEdit={canEdit ? (row) => handleTableAction('edit', row) : undefined}
+            onDelete={canEdit ? (row) => handleDelete(row) : undefined}
             onView={(row) => handleTableAction('view', row)}
             actionState={modalState}
             actionRowId={selectedRecord?.id}
@@ -924,9 +988,9 @@ export default function ProfileDetail() {
             columns={SUC_KHOE_TABLE_COLUMNS}
             data={displayData}
             formatLabel={formatFieldLabel}
-            onAdd={() => handleTableAction('add')}
-            onEdit={(row) => handleTableAction('edit', row)}
-            onDelete={(row) => handleDelete(row)}
+            onAdd={canEdit ? () => handleTableAction('add') : undefined}
+            onEdit={canEdit ? (row) => handleTableAction('edit', row) : undefined}
+            onDelete={canEdit ? (row) => handleDelete(row) : undefined}
             onView={(row) => handleTableAction('view', row)}
             actionState={modalState}
             actionRowId={selectedRecord?.id}
@@ -1005,9 +1069,9 @@ export default function ProfileDetail() {
             columns={displayColumns}
             data={displayData}
             formatLabel={finalFormatLabel}
-            onAdd={() => handleTableAction('add')}
-            onEdit={(row) => handleTableAction('edit', row)}
-            onDelete={(row) => handleDelete(row)}
+            onAdd={canEdit ? () => handleTableAction('add') : undefined}
+            onEdit={canEdit ? (row) => handleTableAction('edit', row) : undefined}
+            onDelete={canEdit ? (row) => handleDelete(row) : undefined}
             onView={(row) => handleTableAction('view', row)}
             actionState={modalState}
             actionRowId={selectedRecord?.id}
@@ -1049,7 +1113,7 @@ export default function ProfileDetail() {
     } else if (activeTab === 'danh_gia_nhiem_vu') {
       tableTitle = '';
     } else if (activeTab === 'bhyt_than_nhan') {
-      displayColumns = ['stt', 'thong_tin_co_ban', 'thong_tin_the', 'dinh_danh_dia_chi', 'ghi_chu'];
+      displayColumns = ['stt', 'thong_tin_co_ban', 'thong_tin_the', 'dinh_danh_dia_chi'];
       displayData = tabData.map((row, idx) => ({
         ...row,
         stt: idx + 1,
@@ -1094,9 +1158,9 @@ export default function ProfileDetail() {
           columns={displayColumns}
           data={displayData}
           formatLabel={finalFormatLabel}
-          onAdd={() => handleTableAction('add')}
-          onEdit={(row) => handleTableAction('edit', row)}
-          onDelete={(row) => handleDelete(row)}
+          onAdd={canEdit ? () => handleTableAction('add') : undefined}
+          onEdit={canEdit ? (row) => handleTableAction('edit', row) : undefined}
+          onDelete={canEdit ? (row) => handleDelete(row) : undefined}
           onView={(row) => handleTableAction('view', row)}
           actionState={modalState}
           actionRowId={selectedRecord?.id}
@@ -1105,23 +1169,11 @@ export default function ProfileDetail() {
             activeTab === 'bhyt_than_nhan' ? (
               <>
                 <tr>
-                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center', borderBottom: '1px solid var(--border)', padding: '0.75rem' }} rowSpan={2}>TT</th>
-                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center', borderBottom: '1px solid var(--border)', padding: '0.75rem' }} rowSpan={2}>Họ tên thân nhân</th>
-                  <th style={{ whiteSpace: 'normal', minWidth: '75px', textAlign: 'center', borderBottom: '1px solid var(--border)', padding: '0.75rem' }} rowSpan={2}>Mối quan hệ với QN</th>
-                  <th style={{ whiteSpace: 'normal', minWidth: '95px', textAlign: 'center', borderBottom: '1px solid var(--border)', padding: '0.75rem' }} rowSpan={2}>Ngày tháng năm sinh thân nhân</th>
-                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center', borderBottom: '1px solid var(--border)', padding: '0.75rem' }} rowSpan={2}>Giới tính</th>
-                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center', borderBottom: '1px solid var(--border)', padding: '0.75rem' }} rowSpan={2}>Dân tộc</th>
-                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center', borderBottom: '1px solid var(--border)', padding: '0.75rem' }} rowSpan={2}>Mã số BHXH<br/>(10 số cuối thẻ BHYT)</th>
-                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center', borderBottom: '1px solid var(--border)', padding: '0.75rem' }} rowSpan={2}>Số CC/CCCD<br/>Nơi cấp</th>
-                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center', borderBottom: '1px solid var(--border)', padding: '0.75rem' }} rowSpan={2}>Nơi KCB</th>
-                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center', borderBottom: '1px solid var(--border)', padding: '0.75rem' }} rowSpan={2}>Số điện thoại</th>
-                  <th colSpan={2} style={{ textAlign: 'center', borderBottom: '1px solid var(--border)', padding: '0.75rem' }}>Địa chỉ</th>
-                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center', borderBottom: '1px solid var(--border)', padding: '0.75rem' }} rowSpan={2}>Nội dung đề nghị</th>
-                  <th rowSpan={2} style={{ textAlign: 'right', width: '120px', borderBottom: '1px solid var(--border)', padding: '0.75rem' }}>Thao tác</th>
-                </tr>
-                <tr>
-                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center', borderBottom: '1px solid var(--border)', padding: '0.75rem' }}>Quê quán</th>
-                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center', borderBottom: '1px solid var(--border)', padding: '0.75rem' }}>Thường trú</th>
+                  <th style={{ whiteSpace: 'nowrap', textAlign: 'center', borderBottom: '1px solid var(--border)', padding: '0.75rem' }}>TT</th>
+                  <th style={{ whiteSpace: 'nowrap', borderBottom: '1px solid var(--border)', padding: '0.75rem' }}>Họ tên thân nhân</th>
+                  <th style={{ whiteSpace: 'nowrap', borderBottom: '1px solid var(--border)', padding: '0.75rem' }}>Thông tin BHYT</th>
+                  <th style={{ whiteSpace: 'nowrap', borderBottom: '1px solid var(--border)', padding: '0.75rem' }}>Thông tin liên quan</th>
+                  <th style={{ textAlign: 'right', width: '120px', borderBottom: '1px solid var(--border)', padding: '0.75rem' }}>Thao tác</th>
                 </tr>
               </>
             ) : undefined

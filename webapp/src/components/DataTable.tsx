@@ -10,13 +10,23 @@ interface DataTableProps {
   onEdit?: (row: any) => void;
   onDelete?: (row: any) => void;
   onView?: (row: any) => void;
+  canEditRow?: (row: any) => boolean;
+  canDeleteRow?: (row: any) => boolean;
   actionState?: 'view' | 'edit' | 'add' | null;
   actionRowId?: string | number | null;
   renderInlineAction?: (row: any) => React.ReactNode;
   customHeader?: React.ReactNode;
+  customRowRender?: (
+    row: any,
+    idx: number,
+    renderActions: (row: any, isInlineActive: boolean) => React.ReactNode
+  ) => React.ReactNode;
 }
 
-export default function DataTable({ title, columns, data, formatLabel, onAdd, onEdit, onDelete, onView, actionState, actionRowId, renderInlineAction, customHeader }: DataTableProps) {
+export default function DataTable({ 
+  title, columns, data, formatLabel, onAdd, onEdit, onDelete, onView, 
+  canEditRow, canDeleteRow, actionState, actionRowId, renderInlineAction, customHeader, customRowRender 
+}: DataTableProps) {
   const hasActions = onView || onEdit || onDelete;
   const showInlineAdd = actionState === 'add' && renderInlineAction;
 
@@ -36,6 +46,29 @@ export default function DataTable({ title, columns, data, formatLabel, onAdd, on
     }
     return val;
   };
+
+  const renderActions = (row: any, isInlineActive: boolean) => (
+    <div className="actions-wrapper" style={{ display: 'flex', gap: '0.25rem', justifyContent: 'flex-end' }}>
+      {onView && (
+        <button className={`btn btn-icon ${isInlineActive && actionState === 'view' ? 'btn-primary' : 'btn-outline'}`} style={{ padding: '0.25rem', border: 'none' }} onClick={(e) => { e.stopPropagation(); onView(row); }} title="Xem">
+          <Eye size={18} />
+          <span className="action-text-mobile">Xem</span>
+        </button>
+      )}
+      {onEdit && (!canEditRow || canEditRow(row)) && (
+        <button className={`btn btn-icon ${isInlineActive && actionState === 'edit' ? 'btn-primary' : 'btn-outline'}`} style={{ padding: '0.25rem', border: 'none', color: isInlineActive && actionState === 'edit' ? '#fff' : 'var(--primary)' }} onClick={(e) => { e.stopPropagation(); onEdit(row); }} title="Sửa">
+          <Edit size={18} />
+          <span className="action-text-mobile">Sửa</span>
+        </button>
+      )}
+      {onDelete && (!canDeleteRow || canDeleteRow(row)) && (
+        <button className="btn btn-icon btn-outline" style={{ padding: '0.25rem', border: 'none', color: 'var(--danger)' }} onClick={(e) => { e.stopPropagation(); onDelete(row); }} title="Xóa">
+          <Trash2 size={18} />
+          <span className="action-text-mobile">Xóa</span>
+        </button>
+      )}
+    </div>
+  );
 
   return (
     <div className="animate-fade-in" style={{ width: '100%' }}>
@@ -78,45 +111,30 @@ export default function DataTable({ title, columns, data, formatLabel, onAdd, on
                 </tr>
               )}
               {data.map((row, idx) => {
-                const isInlineActive = actionState && actionState !== 'add' && actionRowId === row.id;
+                const isInlineActive = !!(actionState && actionState !== 'add' && actionRowId === row.id);
                 
                 return (
                   <React.Fragment key={row.id || idx}>
-                    <tr className="data-row">
-                      {columns.map((col, i) => {
-                        const rawVal = row[col];
-                        const val = formatDateVal(col, rawVal);
-                        return (
-                          <td key={i} data-label={formatLabel(col)} style={{ whiteSpace: React.isValidElement(val) ? 'normal' : 'nowrap' }}>
-                            {val !== null && val !== undefined && val !== '' ? val : <span style={{ color: 'var(--text-muted)' }}>-</span>}
+                    {customRowRender ? (
+                      customRowRender(row, idx, (r, inline) => renderActions(r, inline))
+                    ) : (
+                      <tr className="data-row">
+                        {columns.map((col, i) => {
+                          const rawVal = row[col];
+                          const val = formatDateVal(col, rawVal);
+                          return (
+                            <td key={i} data-label={formatLabel(col)} style={{ whiteSpace: React.isValidElement(val) ? 'normal' : 'nowrap' }}>
+                              {val !== null && val !== undefined && val !== '' ? val : <span style={{ color: 'var(--text-muted)' }}>-</span>}
+                            </td>
+                          );
+                        })}
+                        {hasActions && (
+                          <td data-label="Thao tác" className="actions-col" style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                            {renderActions(row, isInlineActive)}
                           </td>
-                        );
-                      })}
-                      {hasActions && (
-                        <td data-label="Thao tác" className="actions-col" style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                          <div className="actions-wrapper" style={{ display: 'flex', gap: '0.25rem', justifyContent: 'flex-end' }}>
-                            {onView && (
-                              <button className={`btn btn-icon ${isInlineActive && actionState === 'view' ? 'btn-primary' : 'btn-outline'}`} style={{ padding: '0.25rem', border: 'none' }} onClick={(e) => { e.stopPropagation(); onView(row); }} title="Xem">
-                                <Eye size={18} />
-                                <span className="action-text-mobile">Xem</span>
-                              </button>
-                            )}
-                            {onEdit && (
-                              <button className={`btn btn-icon ${isInlineActive && actionState === 'edit' ? 'btn-primary' : 'btn-outline'}`} style={{ padding: '0.25rem', border: 'none', color: isInlineActive && actionState === 'edit' ? '#fff' : 'var(--primary)' }} onClick={(e) => { e.stopPropagation(); onEdit(row); }} title="Sửa">
-                                <Edit size={18} />
-                                <span className="action-text-mobile">Sửa</span>
-                              </button>
-                            )}
-                            {onDelete && (
-                              <button className="btn btn-icon btn-outline" style={{ padding: '0.25rem', border: 'none', color: 'var(--danger)' }} onClick={(e) => { e.stopPropagation(); onDelete(row); }} title="Xóa">
-                                <Trash2 size={18} />
-                                <span className="action-text-mobile">Xóa</span>
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      )}
-                    </tr>
+                        )}
+                      </tr>
+                    )}
 
                     {isInlineActive && renderInlineAction && (
                       <tr className="inline-action-row animate-fade-in" style={{ background: 'var(--bg-card)' }}>

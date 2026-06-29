@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabaseClient';
 import { Search, Plus, User } from 'lucide-react';
 import { PARENT_TABLE, formatFieldLabel, getTableConfig } from '../lib/tableConfig';
 import RecordModal from '../components/RecordModal';
+import { canAddRecord } from '../lib/auth';
 const mapLegacyProfile = (item: any) => ({
   ma_dinh_danh: item.ma_dinh_danh,
   ho_va_ten_khai_sinh: item.ho_ten_thuong_dung,
@@ -167,7 +168,7 @@ export default function Dashboard() {
             <option value="B16">B16</option>
             <option value="A27">A27</option>
           </select>
-          {!isDashboard && (
+          {!isDashboard && canAddRecord() && (
             <>
               <button className="btn btn-primary" style={{ width: 'auto', whiteSpace: 'nowrap', padding: '0.5rem 1rem' }} onClick={() => setShowAddModal(true)}>
                 <Plus size={18} />
