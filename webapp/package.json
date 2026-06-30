@@ -12,6 +12,8 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",
     "browser-image-compression": "^2.0.2",
+    "docx": "^9.7.1",
+    "file-saver": "^2.0.5",
     "lucide-react": "^1.21.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
@@ -19,6 +21,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^24.13.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",

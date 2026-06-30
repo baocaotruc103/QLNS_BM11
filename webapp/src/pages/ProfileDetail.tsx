@@ -297,7 +297,7 @@ export default function ProfileDetail() {
     return rawColumns.filter(column => {
       if (SYSTEM_COLUMNS.includes(column) || column === '__source' || column === 'ma_dinh_danh' || column === 'so_so_bhyt') return false;
       if (tableName === 'nhan_dang' && (['ngay_cap', 'han_dung', 'loai_cap_the'].includes(column) || column.endsWith('_ma'))) return false;
-      if (tableName !== 'nhan_dang' && column.startsWith('ma_')) return false;
+      if (tableName !== 'nhan_dang' && column.startsWith('ma_') && column !== 'ma_so_bhxh') return false;
       if (tableName === 'luong' && ['thang_nam_bat_dau_nhan_luong', 'thang_nam_tham_gia_bhxh', 'so_so_bhxh', 'che_do_luong'].includes(column)) return false;
       return true;
     });
@@ -700,10 +700,16 @@ export default function ProfileDetail() {
         }
       }
     } else {
-      const { error } = record?.id
-        ? await supabase.from(tableName).update(cleanData).eq('id', record.id)
-        : await supabase.from(tableName).insert([cleanData]);
-      saveError = error;
+      if (tableName === PARENT_TABLE) {
+        // thong_tin_quan_nhan dùng ma_dinh_danh làm khóa chính, không có id
+        const { error } = await supabase.from(tableName).update(cleanData).eq('ma_dinh_danh', id);
+        saveError = error;
+      } else {
+        const { error } = record?.id
+          ? await supabase.from(tableName).update(cleanData).eq('id', record.id)
+          : await supabase.from(tableName).insert([cleanData]);
+        saveError = error;
+      }
     }
 
     setInlineSaving(false);

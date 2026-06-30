@@ -21,16 +21,21 @@ export const getCurrentUser = (): AuthUser | null => {
 
 export const isManager = (): boolean => {
   const user = getCurrentUser();
-  return user?.vai_tro === 'manager';
+  return user?.vai_tro ? String(user.vai_tro).toLowerCase() === 'manager' : false;
 };
 
 export const canEditRecord = (recordMaDinhDanh: string, recordDonVi?: string): boolean => {
   const user = getCurrentUser();
   if (!user) return false;
   
-  if (user.vai_tro === 'manager') return true;
-  if (user.vai_tro === 'admin') return user.khoa === recordDonVi;
-  if (user.vai_tro === 'user') return user.ma_dinh_danh === recordMaDinhDanh;
+  const vaiTro = user.vai_tro ? String(user.vai_tro).toLowerCase() : '';
+
+  if (vaiTro === 'manager') return true;
+  if (vaiTro === 'admin') return user.khoa === recordDonVi;
+  if (vaiTro === 'user') {
+    console.log('Checking edit permission:', { userMaDinhDanh: user.ma_dinh_danh, recordMaDinhDanh });
+    return String(user.ma_dinh_danh).trim() === String(recordMaDinhDanh).trim();
+  }
   
   return false;
 };
@@ -38,6 +43,6 @@ export const canEditRecord = (recordMaDinhDanh: string, recordDonVi?: string): b
 export const canAddRecord = (): boolean => {
   const user = getCurrentUser();
   if (!user) return false;
-  // user cannot add, admin can add (usually restricted to their department elsewhere, or allowed generally on dashboard), manager can add
-  return user.vai_tro === 'manager' || user.vai_tro === 'admin';
+  const vaiTro = user.vai_tro ? String(user.vai_tro).toLowerCase() : '';
+  return vaiTro === 'manager' || vaiTro === 'admin';
 };

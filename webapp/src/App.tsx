@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from 'react
 import { LogOut, Menu, ChevronLeft, ChevronRight, User, Key } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import ProfileDetail from './pages/ProfileDetail';
+import BhytReports from './pages/BhytReports';
 import UsersSetting from './pages/settings/UsersSetting';
 import DisplaySetting from './pages/settings/DisplaySetting';
 import PermissionsSetting from './pages/settings/PermissionsSetting';
@@ -266,6 +267,7 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/quan-nhan" element={<Dashboard />} />
               <Route path="/dang-vien" element={<Dashboard />} />
+              <Route path="/bhyt" element={<BhytReports />} />
               <Route path="/profile/:id" element={<ProfileDetail />} />
 
               {/* Settings Routes */}
